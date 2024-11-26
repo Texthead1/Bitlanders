@@ -4,15 +4,25 @@
 signed int temp_s16_0;
 unsigned char temp_u8_0;
 unsigned char temp_u8_1;
+unsigned char temp_u8_2;
+unsigned int temp_u16_0;
+unsigned int temp_u16_1;
 
 // GAME VARIABLES
 enum game_state {
-    STATE_0 = 0,
-    STATE_1 = 1
+    STATE_0,
+    STATE_1,
+    STATE_2
 };
 
 unsigned char game_state;
 unsigned char i;
+unsigned char j;
+unsigned char debug_draw_toggle;
+int digits[3];
+unsigned char write[8];
+unsigned char write2[8];
+const char hexDigits[] = "0123456789ABCDEF";
 unsigned char pad1_poll;
 unsigned char pad1_new;
 
@@ -62,20 +72,15 @@ unsigned char cam_x;
 unsigned char cam_y;
 
 // PLAYER VARIABLES
-#define GROUNDED_MASK 0b00000001
-#define FACING_MASK 0b00000010
-#define FACING_LEFT 0
-#define FACING_RIGHT 1
-
 #define ACCELERATION 0x20
 #define DECELERATION 0x20
 #define BRAKES 0x7A
-#define TOP_SPEED 0x480
+#define TOP_SPEED 0x320
 #define GRAVITY 0x4A
-#define JUMP_FORCE 0x580
+#define JUMP_FORCE 0x540
 #define AIR_ACCEL 0x40
 #define AIR_DRAG 0x14
-#define TERMINAL_VELOCITY 0x1000
+#define TERMINAL_VELOCITY 0x500
 
 struct Player {
     unsigned int x;
@@ -90,7 +95,13 @@ struct Player {
 };
 const unsigned char* current_anim;
 
-struct Player player;
+struct Player player = { 0x1000, 0x1200 };
+
+#define GROUNDED_MASK 0b00000001
+#define FACING_MASK 0b00000010
+#define DEBUG_MASK 0b10000000
+#define FACING_LEFT 0
+#define FACING_RIGHT 1
 
 void player_setGrounded(unsigned char grounded) {
     player.flags = grounded ? player.flags | GROUNDED_MASK : player.flags & ~GROUNDED_MASK;
@@ -108,6 +119,145 @@ unsigned char player_facingRight(void) {
     return player.flags & FACING_MASK;
 }
 
+void player_setDebugMode(unsigned char value) {
+    player.flags = value ? player.flags | DEBUG_MASK : player.flags & ~DEBUG_MASK;
+}
+
+unsigned char player_isDebug(void) {
+    return player.flags & DEBUG_MASK;
+}
+
+// COLLISION VARIABLES
+#define TILE_CMODE_MASK      0b11
+#define TILE_CMODE_NONE      0b00
+#define TILE_CMODE_UPONLY    0b01
+#define TILE_CMODE_HORIZ     0b10
+#define TILE_CMODE_ALL       0b11
+
+#define TILE_CTYPE_SHIFT        0x02
+#define TILE_CTYPE_MASK         0b1111
+#define TILE_CTYPE_FLAT         0b0000
+#define TILE_CTYPE_STEEP        0b0001
+#define TILE_CTYPE_RELAXED1     0b0010
+#define TILE_CTYPE_RELAXED2     0b0011
+#define TILE_CTYPE_CONVEX1      0b0100
+#define TILE_CTYPE_CONVEX2      0b0101
+#define TILE_CTYPE_CONVEX3      0b0110
+#define TILE_CTYPE_STEEP2       0b0111
+#define TILE_CTYPE_STEEP3       0b1000
+#define TILE_CTYPE_CONCAVE1     0b1001
+#define TILE_CTYPE_CONCAVE2     0b1010
+#define TILE_CTYPE_CONCAVE3     0b1011
+#define TILE_CTYPE_CONVEXEDGE   0b1100
+#define TILE_CTYPE_SHARP1       0b1101
+#define TILE_CTYPE_SHARP2       0b1110
+#define TILE_CTYPE_EXTRUDEDWALL 0b1111
+
+#define TILE_FLIPX              0b01000000
+#define TILE_FLIPY              0b10000000
+
+const unsigned char is_solid[] = {
+    0,
+    TILE_CMODE_ALL | (TILE_CTYPE_FLAT << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY | (TILE_CTYPE_STEEP << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY | (TILE_CTYPE_RELAXED1 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY | (TILE_CTYPE_RELAXED2 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY | (TILE_CTYPE_CONVEX1 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY | (TILE_CTYPE_CONVEX2 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY | (TILE_CTYPE_CONVEX3 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY | (TILE_CTYPE_STEEP2 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY | (TILE_CTYPE_STEEP3 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY | (TILE_CTYPE_CONCAVE1 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY | (TILE_CTYPE_CONCAVE2 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY | (TILE_CTYPE_CONCAVE3 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY | (TILE_CTYPE_CONVEXEDGE << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY | (TILE_CTYPE_SHARP1 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY | (TILE_CTYPE_SHARP2 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY | (TILE_CTYPE_EXTRUDEDWALL << TILE_CTYPE_SHIFT)
+};
+
+const unsigned char collision_flat[0x10] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
+
+const unsigned char collision_steep1[0x10] = {
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+};
+
+const unsigned char collision_relaxed1[0x10] = {
+    0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7
+};
+
+const unsigned char collision_relaxed2[0x10] = {
+    8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15
+};
+
+const unsigned char collision_convex1[0x10] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2
+};
+
+const unsigned char collision_convex2[0x10] = {
+    3, 3, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 7, 8, 9, 9
+};
+
+const unsigned char collision_convex3[0x10] = {
+    10, 11, 12, 13, 13, 14, 15, 15, 16, 16, 16, 16, 16, 16, 16, 16
+};
+
+const unsigned char collision_steep2[0x10] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7
+};
+
+const unsigned char collision_steep3[0x10] = {
+    8, 9, 10, 11, 12, 13, 14, 15, 16, 16, 16, 16, 16, 16, 16, 16
+};
+
+const unsigned char collision_concave1[0x10] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 3, 3, 4, 5
+};
+
+const unsigned char collision_concave2[0x10] = {
+    6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 12, 12
+};
+
+const unsigned char collision_concave3[0x10] = {
+    13, 13, 13, 14, 14, 14, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15
+};
+
+const unsigned char collision_convexedge[0x10] = {
+    0, 0, 0, 0, 1, 1, 1, 2, 2, 3, 4, 5, 6, 7, 9, 12
+};
+
+const unsigned char collision_sharp1[0x10] = {
+    2, 4, 6, 8, 10, 12, 14, 16, 16, 16, 16, 16, 16, 16, 16, 16
+};
+
+
+const unsigned char collision_sharp2[0x10] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6, 8, 10, 12, 14
+};
+
+const unsigned char collision_extrudedwall[0x10] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 16, 16, 16, 16, 16, 16, 16, 16
+};
+
+const unsigned char* const collisions[] = {
+    collision_flat, collision_steep1, collision_relaxed1, collision_relaxed2, collision_convex1, collision_convex2, collision_convex3, collision_steep2,
+    collision_steep3, collision_concave1, collision_concave2, collision_concave3, collision_convexedge, collision_sharp1, collision_sharp2, collision_extrudedwall
+};
+
+unsigned char player_old_x;
+unsigned char player_old_y;
+unsigned char player_collision_x;
+unsigned char player_collision_y;
+unsigned char player_temp_x;
+unsigned char player_temp_y;
+unsigned char eject_distance_left;
+unsigned char eject_distance_right;
+unsigned char eject_distance_up;
+unsigned char eject_distance_down;
+
+
 #pragma bss-name(push, "BSS")
 #include "demogame.h"
 
@@ -124,7 +274,7 @@ unsigned char collision_map[240];
 
 const unsigned char palette[] = {
     0x0F, 0x00, 0x10, 0x30,
-    0x00, 0x00, 0x00, 0x00,
+    0x0F, 0x14, 0x22, 0x2B,
     0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00
 };
@@ -136,7 +286,8 @@ const unsigned char bean_palette[] = {
     0x00, 0x00, 0x00, 0x00
 };
 
-const unsigned char poke_fix[] = { 0, 1 };
+const unsigned char poke_fix[] = { 0, 1, 2 };
+
 
 const unsigned char reg[] = "Regular playback";
 const unsigned char emu[] = "Regular emulation";
@@ -144,6 +295,18 @@ const unsigned char mag[] = "Emulation Magic Moment";
 const unsigned char prt[] = "Emulation Portal issue";
 const unsigned char unk[] = "Miscellaneous emu state";
 
+#include "Levels/levels.h"
+
 // PROTOTYPES
+void loadRoom(void);
 void playerMovement(void);
+void playerCollision(void);
+void playerCollisionGround(void);
+void playerCollisionAir(void);
+char collisionLeft(void);
+char collisionRight(void);
+char collisionUp(void);
+char collisionDown(void);
+char checkCollision(void);
+void debugMovement(void);
 void drawPlayer(void);
