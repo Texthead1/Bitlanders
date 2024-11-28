@@ -229,7 +229,7 @@ const unsigned char collision_convexedge[0x10] = {
 };
 
 const unsigned char collision_sharp1[0x10] = {
-    2, 4, 6, 8, 10, 12, 14, 16, 16, 16, 16, 16, 16, 16, 16, 16
+    0, 2, 4, 6, 8, 10, 12, 14, 16, 16, 16, 16, 16, 16, 16, 16
 };
 
 
@@ -246,19 +246,36 @@ const unsigned char* const collisions[] = {
     collision_steep3, collision_concave1, collision_concave2, collision_concave3, collision_convexedge, collision_sharp1, collision_sharp2, collision_extrudedwall
 };
 
+enum collision_direction {
+    COLLISION_NONE,
+    COLLISION_UP,
+    COLLISION_DOWN,
+    COLLISION_LEFT,
+    COLLISION_RIGHT
+};
+
 unsigned char player_old_x;
 unsigned char player_old_y;
+unsigned char sensor_position_x;
+unsigned char sensor_position_y;
 unsigned char player_collision_x;
 unsigned char player_collision_y;
-unsigned char player_temp_x;
+unsigned char tile_x;
+unsigned char tile_y;
+unsigned char surface_distance_into_tile;
+unsigned char surface_position_y;
+unsigned char sensor_distance_into_tile;
+unsigned char player_collision_i;
 unsigned char player_temp_y;
-unsigned char eject_distance_left;
-unsigned char eject_distance_right;
-unsigned char eject_distance_up;
-unsigned char eject_distance_down;
-
+unsigned char eject_distance;
+signed char eject_distance_reserve0;
+signed char eject_distance_reserve1;
+unsigned char collision_direction;
+unsigned char grounded_set;
 
 #pragma bss-name(push, "BSS")
+unsigned char collision_map[240];
+
 #include "demogame.h"
 
 // ENTITY VARIABLES
@@ -270,7 +287,6 @@ struct Entity {
 };
 
 #define ENTITY_QUEUE_MAX 0x10
-unsigned char collision_map[240];
 
 const unsigned char palette[] = {
     0x0F, 0x00, 0x10, 0x30,
@@ -307,6 +323,10 @@ char collisionLeft(void);
 char collisionRight(void);
 char collisionUp(void);
 char collisionDown(void);
+void calculateEjectDistance(signed char*);
+void calculateEjectDistance2(signed char*);
 char checkCollision(void);
+void toString(int num, char* str);
+void toHexString(int num, char* str);
 void debugMovement(void);
 void drawPlayer(void);
