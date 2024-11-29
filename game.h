@@ -158,22 +158,39 @@ unsigned char player_isDebug(void) {
 
 const unsigned char is_solid[] = {
     0,
-    TILE_CMODE_ALL | (TILE_CTYPE_FLAT << TILE_CTYPE_SHIFT),
-    TILE_CMODE_UPONLY | (TILE_CTYPE_STEEP << TILE_CTYPE_SHIFT),
-    TILE_CMODE_UPONLY | (TILE_CTYPE_RELAXED1 << TILE_CTYPE_SHIFT),
-    TILE_CMODE_UPONLY | (TILE_CTYPE_RELAXED2 << TILE_CTYPE_SHIFT),
-    TILE_CMODE_UPONLY | (TILE_CTYPE_CONVEX1 << TILE_CTYPE_SHIFT),
-    TILE_CMODE_UPONLY | (TILE_CTYPE_CONVEX2 << TILE_CTYPE_SHIFT),
-    TILE_CMODE_UPONLY | (TILE_CTYPE_CONVEX3 << TILE_CTYPE_SHIFT),
-    TILE_CMODE_UPONLY | (TILE_CTYPE_STEEP2 << TILE_CTYPE_SHIFT),
-    TILE_CMODE_UPONLY | (TILE_CTYPE_STEEP3 << TILE_CTYPE_SHIFT),
-    TILE_CMODE_UPONLY | (TILE_CTYPE_CONCAVE1 << TILE_CTYPE_SHIFT),
-    TILE_CMODE_UPONLY | (TILE_CTYPE_CONCAVE2 << TILE_CTYPE_SHIFT),
-    TILE_CMODE_UPONLY | (TILE_CTYPE_CONCAVE3 << TILE_CTYPE_SHIFT),
-    TILE_CMODE_UPONLY | (TILE_CTYPE_CONVEXEDGE << TILE_CTYPE_SHIFT),
-    TILE_CMODE_UPONLY | (TILE_CTYPE_SHARP1 << TILE_CTYPE_SHIFT),
-    TILE_CMODE_UPONLY | (TILE_CTYPE_SHARP2 << TILE_CTYPE_SHIFT),
-    TILE_CMODE_UPONLY | (TILE_CTYPE_EXTRUDEDWALL << TILE_CTYPE_SHIFT)
+    TILE_CMODE_ALL       | (TILE_CTYPE_FLAT << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_STEEP << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_RELAXED1 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_RELAXED2 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_CONVEX1 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_CONVEX2 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_CONVEX3 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_STEEP2 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_STEEP3 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_CONCAVE1 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_CONCAVE2 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_CONCAVE3 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_CONVEXEDGE << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_SHARP1 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_SHARP2 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_EXTRUDEDWALL << TILE_CTYPE_SHIFT),
+    TILE_CMODE_ALL       | (TILE_CTYPE_FLAT << TILE_CTYPE_SHIFT)            | TILE_FLIPX,
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_STEEP << TILE_CTYPE_SHIFT)           | TILE_FLIPX,
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_RELAXED1 << TILE_CTYPE_SHIFT)        | TILE_FLIPX,
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_RELAXED2 << TILE_CTYPE_SHIFT)        | TILE_FLIPX,
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_CONVEX1 << TILE_CTYPE_SHIFT)         | TILE_FLIPX,
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_CONVEX2 << TILE_CTYPE_SHIFT)         | TILE_FLIPX,
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_CONVEX3 << TILE_CTYPE_SHIFT)         | TILE_FLIPX,
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_STEEP2 << TILE_CTYPE_SHIFT)          | TILE_FLIPX,
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_STEEP3 << TILE_CTYPE_SHIFT)          | TILE_FLIPX,
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_CONCAVE1 << TILE_CTYPE_SHIFT)        | TILE_FLIPX,
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_CONCAVE2 << TILE_CTYPE_SHIFT)        | TILE_FLIPX,
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_CONCAVE3 << TILE_CTYPE_SHIFT)        | TILE_FLIPX,
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_CONVEXEDGE << TILE_CTYPE_SHIFT)      | TILE_FLIPX,
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_SHARP1 << TILE_CTYPE_SHIFT)          | TILE_FLIPX,
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_SHARP2 << TILE_CTYPE_SHIFT)          | TILE_FLIPX,
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_EXTRUDEDWALL << TILE_CTYPE_SHIFT)    | TILE_FLIPX,
+    TILE_CMODE_UPONLY    | (TILE_CTYPE_STEEP << TILE_CTYPE_SHIFT)           | TILE_FLIPY
 };
 
 const unsigned char collision_flat[0x10] = {
@@ -225,16 +242,19 @@ const unsigned char collision_concave3[0x10] = {
 };
 
 const unsigned char collision_convexedge[0x10] = {
-    0, 0, 0, 0, 1, 1, 1, 2, 2, 3, 4, 5, 6, 7, 9, 12
+    //0, 0, 0, 0, 1, 1, 1, 2, 2, 3, 4, 5, 6, 7, 9, 12
+    0, 0, 0, 0, 1, 1, 1, 2, 2, 3, 4, 5, 6, 7, 16, 16
 };
 
 const unsigned char collision_sharp1[0x10] = {
-    0, 2, 4, 6, 8, 10, 12, 14, 16, 16, 16, 16, 16, 16, 16, 16
+    //0, 2, 4, 6, 8, 10, 12, 14, 16, 16, 16, 16, 16, 16, 16, 16
+    16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
 };
 
 
 const unsigned char collision_sharp2[0x10] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6, 8, 10, 12, 14
+    //0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6, 8, 10, 12, 14
+    16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
 };
 
 const unsigned char collision_extrudedwall[0x10] = {
@@ -244,6 +264,22 @@ const unsigned char collision_extrudedwall[0x10] = {
 const unsigned char* const collisions[] = {
     collision_flat, collision_steep1, collision_relaxed1, collision_relaxed2, collision_convex1, collision_convex2, collision_convex3, collision_steep2,
     collision_steep3, collision_concave1, collision_concave2, collision_concave3, collision_convexedge, collision_sharp1, collision_sharp2, collision_extrudedwall
+};
+
+const unsigned char collision_convexedge_side[0x10] = {
+    16, 16, 16, 16, 16, 16, 16, 16, 16, 1, 1, 1, 0, 0, 0, 0
+};
+
+const unsigned char collision_sharp1_side[0x10] = {
+    15, 15, 14, 14, 13, 13, 12, 12, 11, 11, 10, 10, 9, 9, 8, 8
+};
+
+const unsigned char collision_sharp2_side[0x10] = {
+    7, 7, 6, 6, 5, 5, 4, 4, 3, 3, 2, 2, 1, 1, 0, 0
+};
+
+const unsigned char collision_extrudedwall_side[0x10] = {
+    8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8
 };
 
 enum collision_direction {
@@ -267,7 +303,7 @@ unsigned char surface_position_y;
 unsigned char sensor_distance_into_tile;
 unsigned char player_collision_i;
 unsigned char player_temp_y;
-unsigned char eject_distance;
+signed char eject_distance;
 signed char eject_distance_reserve0;
 signed char eject_distance_reserve1;
 unsigned char collision_direction;
@@ -323,8 +359,7 @@ char collisionLeft(void);
 char collisionRight(void);
 char collisionUp(void);
 char collisionDown(void);
-void calculateEjectDistance(signed char*);
-void calculateEjectDistance2(signed char*);
+void calculateEjectDistanceDown(signed char*);
 char checkCollision(void);
 void toString(int num, char* str);
 void toHexString(int num, char* str);
