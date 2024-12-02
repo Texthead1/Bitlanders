@@ -20,8 +20,8 @@ unsigned char i;
 unsigned char j;
 unsigned char debug_draw_toggle;
 int digits[3];
+unsigned char writeNum;
 unsigned char write[8];
-unsigned char write2[8];
 const char hexDigits[] = "0123456789ABCDEF";
 unsigned char pad1_poll;
 unsigned char pad1_new;
@@ -170,10 +170,10 @@ const unsigned char is_solid[] = {
     TILE_CMODE_UPONLY    | (TILE_CTYPE_CONCAVE1 << TILE_CTYPE_SHIFT),
     TILE_CMODE_UPONLY    | (TILE_CTYPE_CONCAVE2 << TILE_CTYPE_SHIFT),
     TILE_CMODE_UPONLY    | (TILE_CTYPE_CONCAVE3 << TILE_CTYPE_SHIFT),
-    TILE_CMODE_UPONLY    | (TILE_CTYPE_CONVEXEDGE << TILE_CTYPE_SHIFT),
-    TILE_CMODE_UPONLY    | (TILE_CTYPE_SHARP1 << TILE_CTYPE_SHIFT),
-    TILE_CMODE_UPONLY    | (TILE_CTYPE_SHARP2 << TILE_CTYPE_SHIFT),
-    TILE_CMODE_UPONLY    | (TILE_CTYPE_EXTRUDEDWALL << TILE_CTYPE_SHIFT),
+    TILE_CMODE_ALL       | (TILE_CTYPE_CONVEXEDGE << TILE_CTYPE_SHIFT),
+    TILE_CMODE_ALL       | (TILE_CTYPE_SHARP1 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_ALL       | (TILE_CTYPE_SHARP2 << TILE_CTYPE_SHIFT),
+    TILE_CMODE_ALL       | (TILE_CTYPE_EXTRUDEDWALL << TILE_CTYPE_SHIFT),
     TILE_CMODE_ALL       | (TILE_CTYPE_FLAT << TILE_CTYPE_SHIFT)            | TILE_FLIPX,
     TILE_CMODE_UPONLY    | (TILE_CTYPE_STEEP << TILE_CTYPE_SHIFT)           | TILE_FLIPX,
     TILE_CMODE_UPONLY    | (TILE_CTYPE_RELAXED1 << TILE_CTYPE_SHIFT)        | TILE_FLIPX,
@@ -186,10 +186,10 @@ const unsigned char is_solid[] = {
     TILE_CMODE_UPONLY    | (TILE_CTYPE_CONCAVE1 << TILE_CTYPE_SHIFT)        | TILE_FLIPX,
     TILE_CMODE_UPONLY    | (TILE_CTYPE_CONCAVE2 << TILE_CTYPE_SHIFT)        | TILE_FLIPX,
     TILE_CMODE_UPONLY    | (TILE_CTYPE_CONCAVE3 << TILE_CTYPE_SHIFT)        | TILE_FLIPX,
-    TILE_CMODE_UPONLY    | (TILE_CTYPE_CONVEXEDGE << TILE_CTYPE_SHIFT)      | TILE_FLIPX,
-    TILE_CMODE_UPONLY    | (TILE_CTYPE_SHARP1 << TILE_CTYPE_SHIFT)          | TILE_FLIPX,
-    TILE_CMODE_UPONLY    | (TILE_CTYPE_SHARP2 << TILE_CTYPE_SHIFT)          | TILE_FLIPX,
-    TILE_CMODE_UPONLY    | (TILE_CTYPE_EXTRUDEDWALL << TILE_CTYPE_SHIFT)    | TILE_FLIPX,
+    TILE_CMODE_ALL       | (TILE_CTYPE_CONVEXEDGE << TILE_CTYPE_SHIFT)      | TILE_FLIPX,
+    TILE_CMODE_ALL       | (TILE_CTYPE_SHARP1 << TILE_CTYPE_SHIFT)          | TILE_FLIPX,
+    TILE_CMODE_ALL       | (TILE_CTYPE_SHARP2 << TILE_CTYPE_SHIFT)          | TILE_FLIPX,
+    TILE_CMODE_ALL       | (TILE_CTYPE_EXTRUDEDWALL << TILE_CTYPE_SHIFT)    | TILE_FLIPX,
     TILE_CMODE_UPONLY    | (TILE_CTYPE_STEEP << TILE_CTYPE_SHIFT)           | TILE_FLIPY
 };
 
@@ -282,14 +282,6 @@ const unsigned char collision_extrudedwall_side[0x10] = {
     8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8
 };
 
-enum collision_direction {
-    COLLISION_NONE,
-    COLLISION_UP,
-    COLLISION_DOWN,
-    COLLISION_LEFT,
-    COLLISION_RIGHT
-};
-
 unsigned char player_old_x;
 unsigned char player_old_y;
 unsigned char sensor_position_x;
@@ -299,14 +291,13 @@ unsigned char player_collision_y;
 unsigned char tile_x;
 unsigned char tile_y;
 unsigned char surface_distance_into_tile;
-unsigned char surface_position_y;
+unsigned char surface_position;
 unsigned char sensor_distance_into_tile;
 unsigned char player_collision_i;
-unsigned char player_temp_y;
+unsigned char* collision_side;
 signed char eject_distance;
 signed char eject_distance_reserve0;
 signed char eject_distance_reserve1;
-unsigned char collision_direction;
 unsigned char grounded_set;
 
 #pragma bss-name(push, "BSS")
@@ -359,9 +350,11 @@ char collisionLeft(void);
 char collisionRight(void);
 char collisionUp(void);
 char collisionDown(void);
+void calculateEjectDistanceLeft(signed char*);
+void calculateEjectDistanceRight(signed char*);
+void calculateEjectDistanceUp(signed char*);
 void calculateEjectDistanceDown(signed char*);
-char checkCollision(void);
-void toString(int num, char* str);
-void toHexString(int num, char* str);
+void toHexString(unsigned char num, char* str);
+void toHexStringSigned(signed char num, char* str);
 void debugMovement(void);
 void drawPlayer(void);

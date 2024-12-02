@@ -143,7 +143,7 @@ void loadRoom(void) {
     ppu_off();
 
     set_data_pointer(levels[level_pointer]);
-    set_mt_pointer(metatiles[level_pointer >> 1]);
+    set_mt_pointer(metatiles[(level_pointer < 2) ? 0 : 1]);
 
     for (temp_u8_0 = 0; ; temp_u8_0 += 0x20) {
         for (temp_u8_1 = 0; ; temp_u8_1 += 0x20) {
@@ -176,7 +176,6 @@ void playerMovement(void) {
         player_collision_x = high_byte(player.x);
         player_collision_y = high_byte(player.y);
 
-        collision_direction = COLLISION_NONE;
         //collisionDown();
         return;
     }
@@ -218,8 +217,7 @@ void playerMovement(void) {
             }
         }
 
-        // jump!
-        player_collision_y = high_byte(player.y) - 1;
+        player_collision_y = high_byte(player.y) - 3;
         if (pad1_new & PAD_A && !collisionUp()) {
             player_setGrounded(FALSE);
             player.vel_y -= JUMP_FORCE;
@@ -258,96 +256,86 @@ void playerMovement(void) {
         player_collision_x = high_byte(player.x);
         player_collision_y = high_byte(player.y);
 
-        collision_direction = COLLISION_NONE;
-        collisionDown();
-    }
-}
-
-void playerCollisionGround(void) {
-    // horizontal collision
-    if (player.vel_x > 0) { // handle going right
-        if (collisionRight()) {
-            high_byte(player.x) = high_byte(player.x) - eject_distance;
-            player.x &= 0xFF00;
-            player.vel_x = 0;
-        }
-    } else if (player.vel_x < 0) {  // handle going left
-        if (collisionLeft()) {
-            high_byte(player.x) = high_byte(player.x) - eject_distance;
-            player.x &= 0xFF00;
-            player.vel_x = 0;
-        }
-    }
-
-    player_collision_x = high_byte(player.x);
-
-    if (player.vel_y >= 0) {
-        if (collisionDown()) {
-            high_byte(player.y) = high_byte(player.y) - eject_distance;
-            player.y &= 0xFF00;
-            player.vel_y = 0;
-        }
-        ++player_collision_y;
-        if (!collisionDown()) {
-            player_setGrounded(FALSE);
-        }
-    } else if (player.vel_y < 0) {
-        if (collisionUp()) {
-            high_byte(player.y) = high_byte(player.y) - eject_distance;
-            player.y &= 0xFF00;
-            player.vel_y = 0;
+        // collision
+        if (player_IsGrounded()) {
+            if (player.vel_x > 0) {
+                collisionRight();
+            } else if (player.vel_x < 0) {
+                //collisionLeft();
+            }
+            player_collision_x = high_byte(player.x);
+            player_collision_y = high_byte(player.y);
+            collisionDown();
+        } else {
+            if (player.vel_x <= 0) {
+                //collisionLeft();
+            }
+            if (player.vel_y < 0) {
+                collisionUp();
+            } else {
+                collisionDown();
+            }
+            collisionRight();
         }
     }
 }
 
-void playerCollisionAir(void) {
-    if (player.vel_y > 0) {
-        if (collisionDown()) {
-            high_byte(player.y) = high_byte(player.y) - eject_distance;
-            player.y &= 0xFF00;
-            player.vel_y = 0;
-            player_setGrounded(TRUE);
-        }
-    } else if (player.vel_y < 0) {
-        if (collisionUp()) {
-            high_byte(player.y) = high_byte(player.y) - eject_distance;
-            player.y &= 0xFF00;
-            player.vel_y = 0;
-        }
-    }
+char collisionRight(void) {
+    sensor_position_x = player_collision_x + 0x0F;
+    sensor_position_y = player_collision_y;
 
-    player_collision_y = high_byte(player.y);
+    calculateEjectDistanceRight(&eject_distance_reserve0);
 
-    // horizontal collision
-    if (player.vel_x > 0) { // handle going right
-        if (collisionRight()) {
-            high_byte(player.x) = high_byte(player.x) - eject_distance;
-            player.x &= 0xFF00;
-            player.vel_x = 0;
-        }
-    } else if (player.vel_x < 0) {  // handle going left
-        if (collisionLeft()) {
-            high_byte(player.x) = high_byte(player.x) - eject_distance;
-            player.x &= 0xFF00;
-            player.vel_x = 0;
-        }
+    sensor_position_y = player_collision_y + 0x0F;
+    calculateEjectDistanceRight(&eject_distance_reserve1);
+    eject_distance = (eject_distance_reserve1 < eject_distance_reserve0) ? eject_distance_reserve1 : eject_distance_reserve0;
+
+/*
+    write[0] = 'A';
+    write[1] = 0;
+    write[2] = 0;
+    write[3] = 0;
+    toHexString(surface_position, write + 1);
+    write[4] = 'B';
+    write[5] = 0;
+    write[6] = 0;
+    write[7] = 0;
+    toHexString(sensor_position_x, write + 5);
+    multi_vram_buffer_horz(write, sizeof(write), NTADR_A(XPOS - 3, YPOS));
+*/
+    if (eject_distance <= 0) {
+        high_byte(player.x) += eject_distance;
+        player.x &= 0xFF00;
+        player.vel_x = 0;
+        return 1;
     }
+    return 0;
 }
 
 char collisionLeft(void) {
     return 0;
 }
 
-char collisionRight(void) {
-    return 0;
-}
-
 char collisionUp(void) {
+    sensor_position_x = player_collision_x;
+    sensor_position_y = player_collision_y;
+
+    calculateEjectDistanceUp(&eject_distance_reserve0);
+
+    sensor_position_x = player_collision_x + 0x0F;
+    calculateEjectDistanceUp(&eject_distance_reserve1);
+    eject_distance = (eject_distance_reserve1 < eject_distance_reserve0) ? eject_distance_reserve1 : eject_distance_reserve0;
+
+    if (eject_distance < 0) {
+        high_byte(player.y) -= eject_distance;
+        player.y &= 0xFF00;
+        player.vel_y = 0;
+        return 1;
+    }
     return 0;
 }
 
 char collisionDown(void) {
-    collision_direction = COLLISION_DOWN;
     sensor_position_x = player_collision_x;
     sensor_position_y = player_collision_y + 0x0F;
 
@@ -363,14 +351,104 @@ char collisionDown(void) {
         player.y &= 0xFF00;
         player.vel_y = 0;
         player_setGrounded(TRUE);
+        return 1;
     } else if (player_IsGrounded() && eject_distance <= 4) {
         high_byte(player.y) += eject_distance;
         player.y &= 0xFF00;
         player.vel_y = 0;
+        return 1;
     } else {
         player_setGrounded(FALSE);
     }
     return 0;
+}
+
+void fetchTileInfo(void) {
+    player_collision_i = tile_x | (tile_y << 0x04);
+    // solidity flags
+    temp_u8_1 = is_solid[collision_map[player_collision_i]];
+    // CTYPE (use a define in future)
+    temp_u8_2 = (temp_u8_1 >> TILE_CTYPE_SHIFT & TILE_CTYPE_MASK);
+}
+
+void findCollisionSideL(void) {
+    if (!(temp_u8_1 & TILE_CMODE_HORIZ)) {
+        surface_distance_into_tile = 0x10;
+        return;
+    }
+
+    switch (temp_u8_2) {
+        case TILE_CTYPE_CONVEXEDGE:
+            if (temp_u8_1 & TILE_FLIPY) {
+                temp_u8_0 = collision_convexedge_side[15 - (sensor_position_y & 0x0F)];
+            } else {
+                temp_u8_0 = collision_convexedge_side[sensor_position_y & 0x0F];
+            }
+            break;
+        
+        case TILE_CTYPE_SHARP1:
+            if (temp_u8_1 & TILE_FLIPY) {
+                temp_u8_0 = collision_sharp1_side[15 - (sensor_position_y & 0x0F)];
+            } else {
+                temp_u8_0 = collision_sharp1_side[sensor_position_y & 0x0F];
+            }
+            break;
+        
+        case TILE_CTYPE_SHARP2:
+            if (temp_u8_1 & TILE_FLIPY) {
+                temp_u8_0 = collision_sharp2_side[15 - (sensor_position_y & 0x0F)];
+            } else {
+                temp_u8_0 = collision_sharp2_side[sensor_position_y & 0x0F];
+            }
+            break;
+        
+        case TILE_CTYPE_EXTRUDEDWALL:
+            if (temp_u8_1 & TILE_FLIPY) {
+                temp_u8_0 = collision_extrudedwall_side[15 - (sensor_position_y & 0x0F)];
+            } else {
+                temp_u8_0 = collision_extrudedwall_side[sensor_position_y & 0x0F];
+            }
+            break;
+        
+        case TILE_CTYPE_FLAT:
+            surface_distance_into_tile = 0;
+            return;
+        
+        default:
+            // in future, maybe grab a fake horizontal distance into the tile by calculation
+            surface_distance_into_tile = 0x10;
+            return;
+    }
+
+    if (temp_u8_1 & TILE_FLIPX) {
+        surface_distance_into_tile = temp_u8_0;
+    } else {
+        surface_distance_into_tile = (temp_u8_0 == 0x10) ? 0x10 : 0x00;
+    }
+}
+
+void findCollisionSideR(void) {
+    
+}
+
+
+void findCollisionBottom(void) {
+    if (!(temp_u8_1 & TILE_CMODE_ALL)) {
+        surface_distance_into_tile = 0x10;
+        return;
+    }
+
+    if (temp_u8_1 & TILE_FLIPX) {
+        temp_u8_0 = collisions[temp_u8_2][15 - (sensor_position_x & 0x0F)];
+    } else {
+        temp_u8_0 = collisions[temp_u8_2][sensor_position_x & 0x0F];
+    }
+
+    if (temp_u8_1 & TILE_FLIPY) {
+        surface_distance_into_tile = temp_u8_0;
+    } else {
+        surface_distance_into_tile = (temp_u8_0 == 0x10) ? 0x10: 0x00;
+    }
 }
 
 void findCollisionSurface(void) {
@@ -392,79 +470,78 @@ void findCollisionSurface(void) {
     }
 }
 
-void findCollisionBottom(void) {
+void calculateEjectDistanceRight(signed char* value) {
+    tile_x = sensor_position_x >> 0x04;
+    tile_y = sensor_position_y >> 0x04;
+    fetchTileInfo();
+    findCollisionSideL();
+    surface_position = (sensor_position_x & 0xF0) + (surface_distance_into_tile);
 
+    if (surface_distance_into_tile == 0x00) {
+        --tile_x;
+        fetchTileInfo();
+
+        findCollisionSideL();
+        surface_position = ((sensor_position_x - 0x10) & 0xF0) + (surface_distance_into_tile);
+    } else if (surface_distance_into_tile == 0x10) {
+        ++tile_x;
+        fetchTileInfo();
+
+        findCollisionSideL();
+        surface_position = ((sensor_position_x + 0x10) & 0xF0) + (surface_distance_into_tile);
+    }
+    *value = surface_position - (sensor_position_x + 1);
 }
 
-void findCollisionSideL(void) {
+void calculateEjectDistanceUp(signed char* value) {
+    tile_x = sensor_position_x >> 0x04;
+    tile_y = sensor_position_y >> 0x04;
+    fetchTileInfo();
+    findCollisionBottom();
+    surface_position = (sensor_position_y & 0xF0) + (0x10 - surface_distance_into_tile);
 
-}
+    if (surface_distance_into_tile == 0x00) {
+        ++tile_y;
+        fetchTileInfo();
 
-void findCollisionSideR(void) {
-    
-}
+        findCollisionBottom();
+        surface_position = ((sensor_position_y + 0x10) & 0xF0) + (0x10 - surface_distance_into_tile);
+    } else if (surface_distance_into_tile == 0x10) {
+        --tile_y;
+        fetchTileInfo();
 
-void fetchTileInfo(void) {
-    player_collision_i = tile_x | (tile_y << 0x04);
-    temp_u8_1 = is_solid[collision_map[player_collision_i]];
-    temp_u8_2 = (temp_u8_1 >> TILE_CTYPE_SHIFT & TILE_CTYPE_MASK);
+        findCollisionBottom();
+        surface_position = ((sensor_position_y - 0x10) & 0xF0) + (0x10 - surface_distance_into_tile);
+    }
+    *value = sensor_position_y - surface_position;
 }
 
 void calculateEjectDistanceDown(signed char* value) {
     tile_x = sensor_position_x >> 0x04;
     tile_y = sensor_position_y >> 0x04;
     fetchTileInfo();
-
     findCollisionSurface();
-    surface_position_y = (sensor_position_y & 0xF0) + (surface_distance_into_tile);
+    surface_position = (sensor_position_y & 0xF0) + (surface_distance_into_tile);
 
     if (surface_distance_into_tile == 0x00) {
         --tile_y;
         fetchTileInfo();
 
         findCollisionSurface();
-        surface_position_y = ((sensor_position_y - 0x10) & 0xF0) + (surface_distance_into_tile);
+        surface_position = ((sensor_position_y - 0x10) & 0xF0) + (surface_distance_into_tile);
     } else if (surface_distance_into_tile == 0x10) {
         ++tile_y;
         fetchTileInfo();
 
         findCollisionSurface();
-        surface_position_y = ((sensor_position_y + 0x10) & 0xF0) + (surface_distance_into_tile);
+        surface_position = ((sensor_position_y + 0x10) & 0xF0) + (surface_distance_into_tile);
     }
-    *value = surface_position_y - (sensor_position_y + 1);
+    *value = surface_position - (sensor_position_y + 1);
 }
 
-void toString(int num, char* str) {
+void toHexString(unsigned char num, char* str) {
     i = 0;
     j = 0;
-    digits[0] = 0;
-    digits[1] = 0;
-    digits[2] = 0;
-
-    if (num == 0) {
-        str[0] = '0';
-        str[1] = '\0';
-        return;
-    }
-
-    while (num != 0) {
-        digits[i++] = num % 10;
-        num = num / 10;
-    }
-
-    for (j = 0; j < i; j++) {
-        str[j] = '0' + digits[i - j - 1];
-    }
-
-    str[j] = '\0';
-}
-
-void toHexString(int num, char* str) {
-    i = 0;
-    j = 0;
-    digits[0] = 0;
-    digits[1] = 0;
-    digits[2] = 0;
 
     if (num == 0) {
         str[0] = '0';
@@ -475,10 +552,10 @@ void toHexString(int num, char* str) {
 
     while (num != 0 && i < 2) {
         digits[i++] = num & 0xF;
-        num = num / 0x10;
+        num >>= 4;
     }
 
-    if (i < 2) {
+    while (i < 2) {
         digits[i++] = 0;
     }
 
@@ -489,15 +566,50 @@ void toHexString(int num, char* str) {
     str[j] = '\0';
 }
 
+void toHexStringSigned(signed char num, char* str) {
+    i = 0;
+    j = 0;
+
+    if (num == 0) {
+        str[0] = '0';
+        str[1] = '0';
+        str[2] = '\0';
+        return;
+    }
+
+    if (num < 0) {
+        str[0] = '-';
+        num = -num;
+        i++;
+    }
+
+    writeNum = (unsigned char)num;
+
+    while (writeNum != 0 && i < 3) {
+        digits[i++] = writeNum & 0xF;
+        writeNum >>= 4;
+    }
+
+    while (i < 3) {
+        digits[i++] = 0;
+    }
+
+    for (j = 0; j < i; j++) {
+        str[j + (str[0] == '-' ? 1 : 0)] = hexDigits[digits[i - j - 1]];
+    }
+
+    str[j + (str[0] == '-' ? 1 : 0)] = '\0';
+}
+
 void debugMovement(void) {
-    if (pad1_poll & PAD_LEFT)
+    if (pad1_new & PAD_LEFT)
 		--high_byte(player.x);
-	else if (pad1_poll & PAD_RIGHT)
+	else if (pad1_new & PAD_RIGHT)
 		++high_byte(player.x);
 	
-	if (pad1_poll & PAD_UP)
+	if (pad1_new & PAD_UP)
 		--high_byte(player.y);
-	else if (pad1_poll & PAD_DOWN)
+	else if (pad1_new & PAD_DOWN)
 		++high_byte(player.y);
 }
 
