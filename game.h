@@ -1,6 +1,7 @@
 #pragma bss-name(push, "ZEROPAGE")
 
 // GLOBAL VARIABLES //
+signed char temp_s8_0;
 signed int temp_s16_0;
 unsigned char temp_u8_0;
 unsigned char temp_u8_1;
@@ -18,7 +19,6 @@ enum game_state {
 unsigned char game_state;
 unsigned char i;
 unsigned char j;
-unsigned char debug_draw_toggle;
 int digits[3];
 unsigned char writeNum;
 unsigned char write[8];
@@ -68,8 +68,13 @@ unsigned char game_EmuState(void) {
 }
 
 // CAMERA VARIABLES
-unsigned char cam_x;
-unsigned char cam_y;
+#define CAM_BOUND_LEFT 110
+#define CAM_BOUND_RIGHT 130
+#define CAM_BOUND_UP 92
+#define CAM_BOUND_DOWN 132
+
+signed int cam_x;
+signed int cam_y;
 
 // PLAYER VARIABLES
 #define ACCELERATION 0x20
@@ -254,6 +259,7 @@ const unsigned char collision_sharp2[0x10] = {
     16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
 };
 
+/*
 const unsigned char collision_convexedge_true[0x10] = {
     0, 0, 0, 0, 1, 1, 1, 2, 2, 3, 4, 5, 6, 7, 9, 12
 };
@@ -266,6 +272,7 @@ const unsigned char collision_sharp1_true[0x10] = {
 const unsigned char collision_sharp2_true[0x10] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6, 8, 10, 12, 14
 };
+*/
 
 const unsigned char collision_extrudedwall[0x10] = {
     0, 0, 0, 0, 0, 0, 0, 0, 16, 16, 16, 16, 16, 16, 16, 16
@@ -274,11 +281,6 @@ const unsigned char collision_extrudedwall[0x10] = {
 const unsigned char* const collisions[] = {
     collision_flat, collision_steep1, collision_relaxed1, collision_relaxed2, collision_convex1, collision_convex2, collision_convex3, collision_steep2,
     collision_steep3, collision_concave1, collision_concave2, collision_concave3, collision_convexedge, collision_sharp1, collision_sharp2, collision_extrudedwall
-};
-
-const unsigned char* const collisions_true[] = {
-    collision_flat, collision_steep1, collision_relaxed1, collision_relaxed2, collision_convex1, collision_convex2, collision_convex3, collision_steep2,
-    collision_steep3, collision_concave1, collision_concave2, collision_concave3, collision_convexedge_true, collision_sharp1_true, collision_sharp2_true, collision_extrudedwall
 };
 
 const unsigned char collision_convexedge_side[0x10] = {
@@ -293,8 +295,8 @@ const unsigned char collision_sharp2_side[0x10] = {
     7, 7, 6, 6, 5, 5, 4, 4, 3, 3, 2, 2, 1, 1, 0, 0
 };
 
-unsigned char player_old_x;
-unsigned char player_old_y;
+unsigned int player_old_x;
+unsigned int player_old_y;
 unsigned char sensor_position_x;
 unsigned char sensor_position_y;
 unsigned char player_collision_x;
@@ -308,7 +310,8 @@ unsigned char player_collision_i;
 signed char eject_distance;
 signed char eject_distance_reserve0;
 signed char eject_distance_reserve1;
-
+signed int unground_speed;
+unsigned char prev_tile_below;
 #pragma bss-name(push, "BSS")
 unsigned char collision_map[240];
 
@@ -413,19 +416,21 @@ void toHexStringSigned(signed char num, char* str) {
 #include "Levels/levels.h"
 
 // PROTOTYPES
+void changeRoom(void);
 void loadRoom(void);
 void playerMovement(void);
-void playerCollision(void);
-void playerCollisionGround(void);
-void playerCollisionAir(void);
+void debugMovement(void);
+void playerScroll(void);
+char evaluateCollisionLeft(void);
 char collisionLeft(void);
+char collisionLeftGround(void);
+char evaluateCollisionRight(void);
 char collisionRight(void);
+char collisionRightGround(void);
 char collisionUp(void);
-char collisionShouldGround(void);
 char collisionDown(void);
 void calculateEjectDistanceLeft(signed char*);
 void calculateEjectDistanceRight(signed char*);
 void calculateEjectDistanceUp(signed char*);
 void calculateEjectDistanceDown(signed char*);
-void debugMovement(void);
 void drawPlayer(void);
