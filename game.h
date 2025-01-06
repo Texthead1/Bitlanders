@@ -13,10 +13,11 @@ unsigned int temp_u16_1;
 enum game_state {
     STATE_0,
     STATE_1,
-    STATE_2
+    STATE_2,
+    STATE_TITLE
 };
 
-unsigned char game_state;
+unsigned char game_state = STATE_TITLE;
 unsigned char i;
 unsigned char j;
 int digits[3];
@@ -341,7 +342,7 @@ const unsigned char bean_palette[] = {
     0x00, 0x00, 0x00, 0x00
 };
 
-const unsigned char poke_fix[] = { 0, 1, 2 };
+const unsigned char poke_fix[] = { 0, 1, 2, 1 };
 
 
 const unsigned char reg[] = "Regular playback";
@@ -416,6 +417,7 @@ void toHexStringSigned(signed char num, char* str) {
 #include "Levels/levels.h"
 
 // PROTOTYPES
+void writeEmuText(void);
 void changeRoom(void);
 void loadRoom(void);
 void playerMovement(void);

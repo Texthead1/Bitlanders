@@ -4,6 +4,7 @@
 #include "metasprites.h"
 #include "metatiles.h"
 #include "echo.h"
+#include "title.h"
 
 #define XPOS 6
 #define YPOS 8
@@ -13,12 +14,12 @@ void main(void) {
     ppu_off();      // screen off
 
     bank_spr(1);
+    POKE(poke_fix, 0);
 
-    pal_spr(bean_palette);
-    pal_bg(palette); //	load the BG palette
-
-    set_vram_buffer();
-    set_scroll_y(0xff); // shift the bg down 1 pixel
+    vram_adr(NAMETABLE_A);
+    vram_unrle(title);
+    //set_vram_buffer();
+    set_scroll_y(0xB0);
     ppu_on_all();
 
     // variables are defined in game.h
@@ -38,40 +39,51 @@ void main(void) {
         player_old_x = player.x;
         player_old_y = player.y;
 
+        if (game_state == STATE_TITLE)
+        {
+            temp_u8_0 = (get_frame_count() >> 3) & 3;
+            pal_bg(title_palettes[temp_u8_0]);
+        }
 
         if (pad1_new & PAD_START) {
-            game_state = (game_state + 1) % 3;
+            if (game_state == STATE_TITLE) {
+                //pal_clear();
+                //delay(1);
+                game_state = STATE_0;
+                set_vram_buffer();
+            } else {
+                game_state = (game_state + 1) % 3;
+            }
 
             if (game_state == STATE_0) {
-                set_vram_buffer();
                 pal_bg(palette);
                 pal_spr(bean_palette);
-                emu_flags_prev = emu_flags + 1;
-                ppu_off();
-                //vram_adr(NAMETABLE_A);
-                //vram_fill(0, 1024);
-                ppu_on_all();
+                set_scroll_y(0xFF);
                 set_scroll_x(0);
-                
+                ppu_off();
+                vram_adr(NAMETABLE_A);
+                vram_fill(0,1024);
+                ppu_on_all();
+                writeEmuText();
+                POKE(poke_fix + game_state + 1, 1);
             } else if (game_state == STATE_1) {
                 pal_bg(echo_palette);
                 pal_spr(echo_palette);
+                set_scroll_x(0);
                 ppu_off();
                 vram_adr(NAMETABLE_A);
                 vram_unrle(echo);
                 ppu_on_all();
-                set_scroll_x(0);
-
+                POKE(poke_fix + game_state + 1, 2);
             } else {
                 pal_bg(palette);
                 pal_spr(bean_palette);
                 player_setGrounded(FALSE);
                 //cam_x = 0;
                 set_scroll_x(cam_x);
-                
                 loadRoom();
+                POKE(poke_fix + game_state + 1, 1);
             }
-            POKE(poke_fix + game_state, game_state);
         }
 
         switch (game_state) {
@@ -88,29 +100,7 @@ void main(void) {
                     vram_adr(NAMETABLE_A);
                     vram_fill(0,1024);
                     ppu_on_all();
-
-                    if (game_isEmu())
-                    {
-                        switch (temp_u8_0) {
-                            case EMU_REGULAR:
-                                multi_vram_buffer_horz(emu, sizeof(emu), NTADR_A(XPOS, YPOS));
-                                break;
-                            
-                            case EMU_MAGICMOMENT:
-                                multi_vram_buffer_horz(mag, sizeof(mag), NTADR_A(XPOS, YPOS));
-                                break;
-                            
-                            case EMU_PORTAL:
-                                multi_vram_buffer_horz(prt, sizeof(prt), NTADR_A(XPOS, YPOS));
-                                break;
-                            
-                            case EMU_MISC:
-                                multi_vram_buffer_horz(unk, sizeof(unk), NTADR_A(XPOS, YPOS));
-                                break;
-                        }
-                    } else {
-                        multi_vram_buffer_horz(reg, sizeof(reg), NTADR_A(XPOS, YPOS));
-                    }
+                    writeEmuText();
                 }
                 break;
             
@@ -142,6 +132,31 @@ void main(void) {
                 break;
         }
         emu_flags_prev = emu_flags;
+    }
+}
+
+void writeEmuText(void) {
+    if (game_isEmu())
+    {
+        switch (temp_u8_0) {
+            case EMU_REGULAR:
+                multi_vram_buffer_horz(emu, sizeof(emu), NTADR_A(XPOS, YPOS));
+                break;
+            
+            case EMU_MAGICMOMENT:
+                multi_vram_buffer_horz(mag, sizeof(mag), NTADR_A(XPOS, YPOS));
+                break;
+            
+            case EMU_PORTAL:
+                multi_vram_buffer_horz(prt, sizeof(prt), NTADR_A(XPOS, YPOS));
+                break;
+            
+            case EMU_MISC:
+                multi_vram_buffer_horz(unk, sizeof(unk), NTADR_A(XPOS, YPOS));
+                break;
+        }
+    } else {
+        multi_vram_buffer_horz(reg, sizeof(reg), NTADR_A(XPOS, YPOS));
     }
 }
 
@@ -336,7 +351,7 @@ void playerScroll(void) {
         temp_u8_0 = MIN(6, high_byte(player.x) - CAM_BOUND_RIGHT);
         cam_x += temp_u8_0;
         high_byte(player.x) -= temp_u8_0;
-    } else if (high_byte(player.x) < CAM_BOUND_LEFT && cam_x != 0) {
+    } else if (high_byte(player.x) < CAM_BOUND_LEFT) {
         temp_u8_0 = MIN(6, CAM_BOUND_LEFT - high_byte(player.x));
         cam_x -= temp_u8_0;
         high_byte(player.x) += temp_u8_0;

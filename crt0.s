@@ -284,5 +284,6 @@ sounds_data:
 
 
 .segment "CHARS"
+	.incbin "title.chr"
 	.incbin "test.chr"
 	.incbin "echo.chr"
