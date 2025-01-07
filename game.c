@@ -13,21 +13,32 @@ void main(void) {
 
     ppu_off();      // screen off
 
-    bank_spr(1);
+    //pal_spr(bean_palette);
+    //bank_spr(0);
+
     POKE(poke_fix, 0);
 
     vram_adr(NAMETABLE_A);
-    vram_unrle(title);
-    //set_vram_buffer();
-    set_scroll_y(0xB0);
+    vram_unrle(title1);
+    vram_adr(NAMETABLE_B);
+    vram_unrle(title2);
+    set_vram_buffer();
+    set_scroll_y(0xE0);
     ppu_on_all();
 
     // variables are defined in game.h
 
     unground_speed = 0;
-    emu_flags_prev = 1;
     player_setDirection(FACING_RIGHT);
     player_setGrounded(FALSE);
+    oam_meta_spr(245, 162, bean_stand);
+    temp_u8_0 = 0x00;
+    temp_u8_1 = 0;
+    temp_u8_2 = 0;
+    temp_u16_0 = 0xE0;
+    temp_u16_1 = 121;
+    temp_s8_0 = 0;
+    temp_s16_0 = 0x6F;
 
     while (TRUE) {
         ppu_wait_nmi();
@@ -41,48 +52,100 @@ void main(void) {
 
         if (game_state == STATE_TITLE)
         {
-            temp_u8_0 = (get_frame_count() >> 3) & 3;
-            pal_bg(title_palettes[temp_u8_0]);
+            temp_s8_0 = (get_frame_count() >> 3) & 3;
+            pal_bg(title_palettes[temp_s8_0]);
+
+            if (!temp_u8_1 && pad1_new & PAD_START) {
+                //pal_fade_to(4, 0);
+                //scroll(0x100, 0x100);
+                //pal_fade_to(0, 4);
+                temp_u8_1 = 1;
+            }
+
+            if (temp_u8_0 == 20) {
+                if (temp_u8_2 == 2) {
+                    multi_vram_buffer_horz(emu_screen_text0_fadein0, sizeof(emu_screen_text0_fadein0), NTADR_B(8, 17));
+                    multi_vram_buffer_horz(emu_screen_text1_fadein0, sizeof(emu_screen_text1_fadein0), NTADR_B(8, 20));
+                    multi_vram_buffer_horz(emu_screen_text2_fadein0, sizeof(emu_screen_text2_fadein0), NTADR_B(8, 23));
+                    multi_vram_buffer_horz(emu_screen_text3_fadein0, sizeof(emu_screen_text3_fadein0), NTADR_B(8, 26));
+                } else if (temp_u8_2 == 6) {
+                    multi_vram_buffer_horz(emu_screen_text0_fadein1, sizeof(emu_screen_text0_fadein1), NTADR_B(8, 17));
+                    multi_vram_buffer_horz(emu_screen_text1_fadein1, sizeof(emu_screen_text1_fadein1), NTADR_B(8, 20));
+                    multi_vram_buffer_horz(emu_screen_text2_fadein1, sizeof(emu_screen_text2_fadein1), NTADR_B(8, 23));
+                    multi_vram_buffer_horz(emu_screen_text3_fadein1, sizeof(emu_screen_text3_fadein1), NTADR_B(8, 26));
+                } else if (temp_u8_2 == 10) {
+                    multi_vram_buffer_horz(emu_screen_text0_fadein2, sizeof(emu_screen_text0_fadein2), NTADR_B(8, 17));
+                    multi_vram_buffer_horz(emu_screen_text1_fadein2, sizeof(emu_screen_text1_fadein2), NTADR_B(8, 20));
+                    multi_vram_buffer_horz(emu_screen_text2_fadein2, sizeof(emu_screen_text2_fadein2), NTADR_B(8, 23));
+                    multi_vram_buffer_horz(emu_screen_text3_fadein2, sizeof(emu_screen_text3_fadein2), NTADR_B(8, 26));
+                }
+                xy_split(0x100, 0x83);
+
+                if (temp_u8_2 != 11) {
+                    ++temp_u8_2;
+                }
+
+                if (pad1_new & PAD_START) {
+                    goto boot;
+                }
+            } else if (temp_u8_1) {
+                if (temp_u8_0 == 15) {
+                    if (!game_isEmu()) {
+                        //goto boot;
+                    }
+                    oam_clear();
+                    oam_meta_spr(245, 122, bean_stand);
+                }
+
+                if (temp_u8_0 == 4) {
+                    multi_vram_buffer_horz(press_start_fade0, sizeof(press_start_fade0), NTADR_A(5, 23));
+                } else if (temp_u8_0 == 8) {
+                    multi_vram_buffer_horz(press_start_fade1, sizeof(press_start_fade1), NTADR_A(5, 23));
+                } else if (temp_u8_0 == 12) {
+                    multi_vram_buffer_horz(die, sizeof(die), NTADR_A(5, 23));
+                }
+                ++temp_u8_0;
+                ++temp_u8_2;
+                if (temp_u8_0 > 17) {
+                    temp_u8_0 = 20;
+                    xy_split(0x100, 0x83);
+                } else {
+                    xy_split(0x0, 0xB3);
+                }
+
+                if (temp_u8_2 != sizeof(scroll_amount) /* && game_isEmu()*/) {
+                    temp_u16_0 += scroll_amount[temp_u8_2];
+                    scroll(0x00, temp_u16_0);
+                } else {
+                    --temp_u8_2;
+                }
+
+                if (temp_u8_0 == 20) {
+                    temp_u8_2 = 0;
+                }
+                
+                //if (pad1_new & PAD_START) goto boot;
+            } else {
+                xy_split(0x00, 0xB3);
+            }
+            continue;
         }
 
         if (pad1_new & PAD_START) {
+            boot:
             if (game_state == STATE_TITLE) {
+                pal_fade_to(4, 0);
                 //pal_clear();
                 //delay(1);
                 game_state = STATE_0;
                 set_vram_buffer();
+                oam_clear();
+                changeScene();
+                bank_spr(1);
+                pal_fade_to(0, 4);
             } else {
                 game_state = (game_state + 1) % 3;
-            }
-
-            if (game_state == STATE_0) {
-                pal_bg(palette);
-                pal_spr(bean_palette);
-                set_scroll_y(0xFF);
-                set_scroll_x(0);
-                ppu_off();
-                vram_adr(NAMETABLE_A);
-                vram_fill(0,1024);
-                ppu_on_all();
-                writeEmuText();
-                POKE(poke_fix + game_state + 1, 1);
-            } else if (game_state == STATE_1) {
-                pal_bg(echo_palette);
-                pal_spr(echo_palette);
-                set_scroll_x(0);
-                ppu_off();
-                vram_adr(NAMETABLE_A);
-                vram_unrle(echo);
-                ppu_on_all();
-                POKE(poke_fix + game_state + 1, 2);
-            } else {
-                pal_bg(palette);
-                pal_spr(bean_palette);
-                player_setGrounded(FALSE);
-                //cam_x = 0;
-                set_scroll_x(cam_x);
-                loadRoom();
-                POKE(poke_fix + game_state + 1, 1);
+                changeScene();
             }
         }
 
@@ -132,6 +195,38 @@ void main(void) {
                 break;
         }
         emu_flags_prev = emu_flags;
+    }
+}
+
+void changeScene(void) {
+    if (game_state == STATE_0) {
+        pal_bg(palette);
+        pal_spr(bean_palette);
+        set_scroll_y(0xFF);
+        set_scroll_x(0);
+        ppu_off();
+        vram_adr(NAMETABLE_A);
+        vram_fill(0,1024);
+        ppu_on_all();
+        writeEmuText();
+        POKE(poke_fix + game_state + 1, 1);
+    } else if (game_state == STATE_1) {
+        pal_bg(echo_palette);
+        pal_spr(echo_palette);
+        set_scroll_x(0);
+        ppu_off();
+        vram_adr(NAMETABLE_A);
+        vram_unrle(echo);
+        ppu_on_all();
+        POKE(poke_fix + game_state + 1, 2);
+    } else {
+        pal_bg(palette);
+        pal_spr(bean_palette);
+        player_setGrounded(FALSE);
+        //cam_x = 0;
+        set_scroll_x(cam_x);
+        loadRoom();
+        POKE(poke_fix + game_state + 1, 1);
     }
 }
 

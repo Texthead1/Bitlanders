@@ -6,6 +6,7 @@ signed int temp_s16_0;
 unsigned char temp_u8_0;
 unsigned char temp_u8_1;
 unsigned char temp_u8_2;
+unsigned char temp_u8_3;
 unsigned int temp_u16_0;
 unsigned int temp_u16_1;
 
@@ -417,6 +418,7 @@ void toHexStringSigned(signed char num, char* str) {
 #include "Levels/levels.h"
 
 // PROTOTYPES
+void changeScene(void);
 void writeEmuText(void);
 void changeRoom(void);
 void loadRoom(void);
