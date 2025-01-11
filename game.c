@@ -11,10 +11,8 @@
 
 void main(void) {
 
-    ppu_off();      // screen off
-
-    //pal_spr(bean_palette);
-    //bank_spr(0);
+    ppu_off();
+    pal_spr(title_palette_sprites);
 
     POKE(poke_fix, 0);
 
@@ -23,22 +21,21 @@ void main(void) {
     vram_adr(NAMETABLE_B);
     vram_unrle(title2);
     set_vram_buffer();
-    set_scroll_y(0xE0);
+
+#define INIT_SCREEN_SCROLL_Y 0xE0
+    set_scroll_y(INIT_SCREEN_SCROLL_Y);
     ppu_on_all();
 
-    // variables are defined in game.h
 
-    unground_speed = 0;
     player_setDirection(FACING_RIGHT);
     player_setGrounded(FALSE);
-    oam_meta_spr(245, 162, bean_stand);
-    temp_u8_0 = 0x00;
-    temp_u8_1 = 0;
-    temp_u8_2 = 0;
-    temp_u16_0 = 0xE0;
-    temp_u16_1 = 121;
-    temp_s8_0 = 0;
-    temp_s16_0 = 0x6F;
+    oam_spr(245, 162, 0xFE, 0x01);
+    temp_u16_0 = INIT_SCREEN_SCROLL_Y;
+
+    game_state = STATE_TITLE;
+    unground_speed = 0;
+
+#undef INIT_SCREEN_SCROLL_Y
 
     while (TRUE) {
         ppu_wait_nmi();
@@ -47,89 +44,166 @@ void main(void) {
         pad1_poll = pad_poll(0);
         pad1_new = get_pad_new(0);
 
-        player_old_x = player.x;
-        player_old_y = player.y;
-
+#define TITLE_MENU_STATE temp_u8_0
+#define TITLE_PALETTE_CYCLE temp_u8_2
+#define TITLE_TEXT_PHASE temp_u8_1
+#define TITLE_SCROLL_Y temp_u16_0
+#define PRESS_START_TEXT_POS NTADR_A(5, 23)
+#define Y_OFFSET 3
+#define EMU_MENU_TEXT(num) NTADR_B(8, 17 + (Y_OFFSET * num))
+#define EMU_MENU_SELECTION temp_s8_0
+        
         if (game_state == STATE_TITLE)
         {
-            temp_s8_0 = (get_frame_count() >> 3) & 3;
-            pal_bg(title_palettes[temp_s8_0]);
+            TITLE_PALETTE_CYCLE = (get_frame_count() >> 3) & 3;
+            pal_bg(title_palettes[TITLE_PALETTE_CYCLE]);
 
-            if (!temp_u8_1 && pad1_new & PAD_START) {
-                //pal_fade_to(4, 0);
-                //scroll(0x100, 0x100);
-                //pal_fade_to(0, 4);
-                temp_u8_1 = 1;
-            }
+            switch (TITLE_MENU_STATE) {
+                case 0:
+                    xy_split(0x00, 0xB3);
 
-            if (temp_u8_0 == 20) {
-                if (temp_u8_2 == 2) {
-                    multi_vram_buffer_horz(emu_screen_text0_fadein0, sizeof(emu_screen_text0_fadein0), NTADR_B(8, 17));
-                    multi_vram_buffer_horz(emu_screen_text1_fadein0, sizeof(emu_screen_text1_fadein0), NTADR_B(8, 20));
-                    multi_vram_buffer_horz(emu_screen_text2_fadein0, sizeof(emu_screen_text2_fadein0), NTADR_B(8, 23));
-                    multi_vram_buffer_horz(emu_screen_text3_fadein0, sizeof(emu_screen_text3_fadein0), NTADR_B(8, 26));
-                } else if (temp_u8_2 == 6) {
-                    multi_vram_buffer_horz(emu_screen_text0_fadein1, sizeof(emu_screen_text0_fadein1), NTADR_B(8, 17));
-                    multi_vram_buffer_horz(emu_screen_text1_fadein1, sizeof(emu_screen_text1_fadein1), NTADR_B(8, 20));
-                    multi_vram_buffer_horz(emu_screen_text2_fadein1, sizeof(emu_screen_text2_fadein1), NTADR_B(8, 23));
-                    multi_vram_buffer_horz(emu_screen_text3_fadein1, sizeof(emu_screen_text3_fadein1), NTADR_B(8, 26));
-                } else if (temp_u8_2 == 10) {
-                    multi_vram_buffer_horz(emu_screen_text0_fadein2, sizeof(emu_screen_text0_fadein2), NTADR_B(8, 17));
-                    multi_vram_buffer_horz(emu_screen_text1_fadein2, sizeof(emu_screen_text1_fadein2), NTADR_B(8, 20));
-                    multi_vram_buffer_horz(emu_screen_text2_fadein2, sizeof(emu_screen_text2_fadein2), NTADR_B(8, 23));
-                    multi_vram_buffer_horz(emu_screen_text3_fadein2, sizeof(emu_screen_text3_fadein2), NTADR_B(8, 26));
-                }
-                xy_split(0x100, 0x83);
-
-                if (temp_u8_2 != 11) {
-                    ++temp_u8_2;
-                }
-
-                if (pad1_new & PAD_START) {
-                    goto boot;
-                }
-            } else if (temp_u8_1) {
-                if (temp_u8_0 == 15) {
-                    if (!game_isEmu()) {
-                        //goto boot;
+                    if (pad1_new & PAD_START) {
+                        ++TITLE_MENU_STATE;
+                    } else if (pad1_new & PAD_SELECT) {
+                        game_setEmu(TRUE);
+                        game_setEmuState(EMU_STATE_REGULAR);
+                        emu_flags_prev = emu_flags;
                     }
-                    oam_clear();
-                    oam_meta_spr(245, 122, bean_stand);
-                }
-
-                if (temp_u8_0 == 4) {
-                    multi_vram_buffer_horz(press_start_fade0, sizeof(press_start_fade0), NTADR_A(5, 23));
-                } else if (temp_u8_0 == 8) {
-                    multi_vram_buffer_horz(press_start_fade1, sizeof(press_start_fade1), NTADR_A(5, 23));
-                } else if (temp_u8_0 == 12) {
-                    multi_vram_buffer_horz(die, sizeof(die), NTADR_A(5, 23));
-                }
-                ++temp_u8_0;
-                ++temp_u8_2;
-                if (temp_u8_0 > 17) {
-                    temp_u8_0 = 20;
-                    xy_split(0x100, 0x83);
-                } else {
-                    xy_split(0x0, 0xB3);
-                }
-
-                if (temp_u8_2 != sizeof(scroll_amount) /* && game_isEmu()*/) {
-                    temp_u16_0 += scroll_amount[temp_u8_2];
-                    scroll(0x00, temp_u16_0);
-                } else {
-                    --temp_u8_2;
-                }
-
-                if (temp_u8_0 == 20) {
-                    temp_u8_2 = 0;
-                }
+                    break;
                 
-                //if (pad1_new & PAD_START) goto boot;
-            } else {
-                xy_split(0x00, 0xB3);
+                case 1:
+                    xy_split(0x00, 0xB3);
+                    if ((TITLE_TEXT_PHASE) & 2) {
+                        multi_vram_buffer_horz(press_start_text, sizeof(press_start_text), PRESS_START_TEXT_POS);
+                    } else {
+                        multi_vram_buffer_horz(clear_text, sizeof(press_start_text), PRESS_START_TEXT_POS);
+                    }
+
+                    ++TITLE_TEXT_PHASE;
+
+                    if (game_isEmu()) {
+                        if (TITLE_TEXT_PHASE == 24) {
+                            ++TITLE_MENU_STATE;
+                            TITLE_TEXT_PHASE = 0;
+                            TITLE_SCROLL_Y += scroll_amount[0];
+                            scroll(0x00, TITLE_SCROLL_Y);
+                        }
+                    } else if (TITLE_TEXT_PHASE == 33) {
+                        multi_vram_buffer_horz(clear_text, sizeof(press_start_text), PRESS_START_TEXT_POS);
+                        goto boot;
+                    }
+                    break;
+                
+                case 2:
+                    switch (TITLE_TEXT_PHASE) {
+                        case 0:
+                            multi_vram_buffer_horz(press_start_text_fade0, sizeof(press_start_text_fade0), PRESS_START_TEXT_POS);
+                            break;
+
+                        case 2:
+                            multi_vram_buffer_horz(press_start_text_fade1, sizeof(press_start_text_fade1), PRESS_START_TEXT_POS);
+                            break;
+
+                        case 4:
+                            multi_vram_buffer_horz(clear_text, sizeof(press_start_text), PRESS_START_TEXT_POS);
+                            break;
+                        
+                        case 15:
+                            ++TITLE_MENU_STATE;
+                            TITLE_TEXT_PHASE = 0;
+                            oam_clear();
+                            oam_spr(245, 122, 0xFE, 0x01);
+                            goto third;
+                    }
+                    TITLE_SCROLL_Y += scroll_amount[TITLE_TEXT_PHASE + 1];
+                    scroll(0x00, TITLE_SCROLL_Y);
+                    xy_split(0x0, 0xB3);
+                    ++TITLE_TEXT_PHASE;
+                    break;
+                
+                case 3:
+                    third:
+                    switch (TITLE_TEXT_PHASE) {
+                        case 0:
+                            multi_vram_buffer_horz(emu_screen_text0_fade2, sizeof(emu_screen_text0_fade2), EMU_MENU_TEXT(0));
+                            multi_vram_buffer_horz(emu_screen_text1_fade2, sizeof(emu_screen_text1_fade2), EMU_MENU_TEXT(1));
+                            multi_vram_buffer_horz(emu_screen_text2_fade2, sizeof(emu_screen_text2_fade2), EMU_MENU_TEXT(2));
+                            multi_vram_buffer_horz(emu_screen_text3_fade2, sizeof(emu_screen_text3_fade2), EMU_MENU_TEXT(3));
+                            break;
+                        
+                        case 4:
+                            multi_vram_buffer_horz(emu_screen_text0_fade1, sizeof(emu_screen_text0_fade1), EMU_MENU_TEXT(0));
+                            multi_vram_buffer_horz(emu_screen_text1_fade1, sizeof(emu_screen_text1_fade1), EMU_MENU_TEXT(1));
+                            multi_vram_buffer_horz(emu_screen_text2_fade1, sizeof(emu_screen_text2_fade1), EMU_MENU_TEXT(2));
+                            multi_vram_buffer_horz(emu_screen_text3_fade1, sizeof(emu_screen_text3_fade1), EMU_MENU_TEXT(3));
+                            break;
+                        
+                        case 8:
+                            multi_vram_buffer_horz(emu_screen_text0, sizeof(emu_screen_text0), EMU_MENU_TEXT(0));
+                            multi_vram_buffer_horz(emu_screen_text1, sizeof(emu_screen_text1), EMU_MENU_TEXT(1));
+                            multi_vram_buffer_horz(emu_screen_text2, sizeof(emu_screen_text2), EMU_MENU_TEXT(2));
+                            multi_vram_buffer_horz(emu_screen_text3, sizeof(emu_screen_text3), EMU_MENU_TEXT(3));
+                            ++TITLE_MENU_STATE;
+                            TITLE_TEXT_PHASE = 0;
+                            goto fourth;
+                    }
+                    xy_split(0x100, 0x83);
+                    ++TITLE_TEXT_PHASE;
+                    break;
+                
+                case 4:
+                    fourth:
+                    xy_split(0x100, 0x83);
+                    if (pad1_new & PAD_UP && EMU_MENU_SELECTION) {
+                        --EMU_MENU_SELECTION;
+                    }
+                    if (pad1_new & PAD_SELECT) {
+                        EMU_MENU_SELECTION = (EMU_MENU_SELECTION + 1) & 3;
+                    } else if (pad1_new & PAD_DOWN) {
+                        EMU_MENU_SELECTION = MIN(3, EMU_MENU_SELECTION + 1);
+                    }
+
+                    oam_clear();
+                    oam_spr(245, 122, 0xFE, 0x01);
+                    oam_spr(48, 128 + (0x18 * EMU_MENU_SELECTION), 0xFF, 0x00);
+
+                    if (pad1_new & PAD_START) {
+                        ++TITLE_MENU_STATE;
+                        TITLE_TEXT_PHASE = 0;
+                    }
+                    break;
+                case 5:
+                    xy_split(0x100, 0x83);
+                    if ((TITLE_TEXT_PHASE) & 2) {
+                        multi_vram_buffer_horz(emu_screen_texts[EMU_MENU_SELECTION], emu_screen_text_sizes[EMU_MENU_SELECTION], EMU_MENU_TEXT(EMU_MENU_SELECTION));
+                    } else {
+                        multi_vram_buffer_horz(clear_text, emu_screen_text_sizes[EMU_MENU_SELECTION], EMU_MENU_TEXT(EMU_MENU_SELECTION));
+                    }
+
+                    ++TITLE_TEXT_PHASE;
+
+                    if (TITLE_TEXT_PHASE == 33) {
+                        goto boot;
+                    }
+                    break;
             }
             continue;
         }
+
+#undef TITLE_MENU_STATE
+#undef TITLE_PALETTE_CYCLE
+#undef TITLE_TEXT_PHASE
+#undef TITLE_SCROLL_Y
+#undef PRESS_START_TEXT_POS
+#undef Y_OFFSET
+#undef EMU_MENU_TEXT_POS_0
+#undef EMU_MENU_TEXT_POS_1
+#undef EMU_MENU_TEXT_POS_2
+#undef EMU_MENU_TEXT_POS_3
+#undef EMU_MENU_SELECTION
+
+        player_old_x = player.x;
+        player_old_y = player.y;
 
         if (pad1_new & PAD_START) {
             boot:
@@ -233,20 +307,20 @@ void changeScene(void) {
 void writeEmuText(void) {
     if (game_isEmu())
     {
-        switch (temp_u8_0) {
-            case EMU_REGULAR:
+        switch (game_EmuState()) {
+            case EMU_STATE_REGULAR:
                 multi_vram_buffer_horz(emu, sizeof(emu), NTADR_A(XPOS, YPOS));
                 break;
             
-            case EMU_MAGICMOMENT:
+            case EMU_STATE_MAGICMOMENT:
                 multi_vram_buffer_horz(mag, sizeof(mag), NTADR_A(XPOS, YPOS));
                 break;
             
-            case EMU_PORTAL:
+            case EMU_STATE_PORTAL:
                 multi_vram_buffer_horz(prt, sizeof(prt), NTADR_A(XPOS, YPOS));
                 break;
             
-            case EMU_MISC:
+            case EMU_STATE_MISC:
                 multi_vram_buffer_horz(unk, sizeof(unk), NTADR_A(XPOS, YPOS));
                 break;
         }

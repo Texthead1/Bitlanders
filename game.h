@@ -18,7 +18,7 @@ enum game_state {
     STATE_TITLE
 };
 
-unsigned char game_state = STATE_TITLE;
+unsigned char game_state;
 unsigned char i;
 unsigned char j;
 int digits[3];
@@ -33,16 +33,16 @@ unsigned char pad1_new;
 #define EMU_STATE_MASK 0b00000110
 
 enum emu_state {
-    EMU_REGULAR = 0x00,
+    EMU_STATE_REGULAR = 0x00,
     /*
      * @brief Alerts when the external magic moment is active
      */
-    EMU_MAGICMOMENT = 0x01,
+    EMU_STATE_MAGICMOMENT = 0x01,
     /*
      * @brief Alerts when there's an external issue with the Portal
      */
-    EMU_PORTAL = 0x02,
-    EMU_MISC = 0x03
+    EMU_STATE_PORTAL = 0x02,
+    EMU_STATE_MISC = 0x03
 };
 
 // Flags:
@@ -61,8 +61,8 @@ unsigned char game_isEmu(void) {
 }
 
 void game_setEmuState(unsigned char state) {
-    emu_flags &= ~EMU_MISC;
-    emu_flags |= (state << 0x01);
+    emu_flags &= ~EMU_STATE_MASK;
+    emu_flags |= (state << 0x01) & EMU_STATE_MASK;
 }
 
 unsigned char game_EmuState(void) {
@@ -345,7 +345,6 @@ const unsigned char bean_palette[] = {
 
 const unsigned char poke_fix[] = { 0, 1, 2, 1 };
 
-
 const unsigned char reg[] = "Regular playback";
 const unsigned char emu[] = "Regular emulation";
 const unsigned char mag[] = "Emulation Magic Moment";
@@ -414,6 +413,8 @@ void toHexStringSigned(signed char num, char* str) {
 
     str[j + (str[0] == '-' ? 1 : 0)] = '\0';
 }
+
+unsigned char text[0x10];
 
 #include "Levels/levels.h"
 
