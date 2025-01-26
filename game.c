@@ -834,13 +834,13 @@ void calculateEjectDistanceLeft(signed char* value) {
     surface_position = (sensor_position_x & 0xF0) + (0x10 - surface_distance_into_tile);
     
     if (surface_distance_into_tile == 0x00) {
-        ++tile_x;
+        tile_x = (tile_x + 1) & 0xF;
         fetchTileInfo();
 
         findCollisionSideR();
         surface_position = ((sensor_position_x + 0x10) & 0xF0) + (0x10 - surface_distance_into_tile);
     } else if (surface_distance_into_tile == 0x10) {
-        --tile_x;
+        tile_x = (tile_x - 1) & 0xF;
         fetchTileInfo();
 
         findCollisionSideR();
@@ -857,13 +857,13 @@ void calculateEjectDistanceRight(signed char* value) {
     surface_position = (sensor_position_x & 0xF0) + (surface_distance_into_tile);
 
     if (surface_distance_into_tile == 0x00) {
-        --tile_x;
+        tile_x = (tile_x - 1) & 0xF;
         fetchTileInfo();
 
         findCollisionSideL();
         surface_position = ((sensor_position_x - 0x10) & 0xF0) + (surface_distance_into_tile);
     } else if (surface_distance_into_tile == 0x10) {
-        ++tile_x;
+        tile_x = (tile_x + 1) & 0xF;
         fetchTileInfo();
 
         findCollisionSideL();
@@ -880,13 +880,13 @@ void calculateEjectDistanceUp(signed char* value) {
     surface_position = (sensor_position_y & 0xF0) + (0x10 - surface_distance_into_tile);
 
     if (surface_distance_into_tile == 0x00) {
-        ++tile_y;
+        tile_y = (tile_y + 1) & 0xF;
         fetchTileInfo();
 
         findCollisionBottom();
         surface_position = ((sensor_position_y + 0x10) & 0xF0) + (0x10 - surface_distance_into_tile);
     } else if (surface_distance_into_tile == 0x10) {
-        --tile_y;
+        tile_y = (tile_y - 1) & 0xF;
         fetchTileInfo();
 
         findCollisionBottom();
@@ -903,13 +903,13 @@ void calculateEjectDistanceDown(signed char* value) {
     surface_position = (sensor_position_y & 0xF0) + (surface_distance_into_tile);
 
     if (surface_distance_into_tile == 0x00) {
-        --tile_y;
+        tile_y = (tile_y - 1) & 0xF;
         fetchTileInfo();
 
         findCollisionSurface();
         surface_position = ((sensor_position_y - 0x10) & 0xF0) + (surface_distance_into_tile);
     } else if (surface_distance_into_tile == 0x10) {
-        ++tile_y;
+        tile_y = (tile_y + 1) & 0xF;
         fetchTileInfo();
 
         findCollisionSurface();
