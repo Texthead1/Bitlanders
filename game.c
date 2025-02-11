@@ -931,6 +931,11 @@ void setPlayerAnim(unsigned char* anim) {
 void drawPlayer(void) {
     ++player.anim_timer;
 
+    if (current_anim != bean_walk_anim[0] || current_anim != bean_walk_anim[1] || current_anim != bean_walk_anim[2] || current_anim != bean_walk_anim_flipped[0] || current_anim != bean_walk_anim_flipped[1] || current_anim != bean_walk_anim_flipped[2]) {
+        if (player.vel_x <= RUN_THRESHOLD && player.vel_x >= -RUN_THRESHOLD)
+            current_anim_frame = 0;
+    }
+
     if (!player_IsGrounded()) {
         if (player.vel_y < 0)
             setPlayerAnim(player_facingRight() ? bean_jump : bean_jump_flipped);
@@ -955,8 +960,11 @@ void drawPlayer(void) {
     else
         temp_u8_0 = 0;
 
-    if (player.vel_x > RUN_THRESHOLD || player.vel_x < -RUN_THRESHOLD)
-        temp_u8_1 = (temp_u8_0 >> 1) & 0xF;
+    if (player.vel_x > RUN_THRESHOLD || player.vel_x < -RUN_THRESHOLD) {
+        if ((temp_u8_0 % 3) == 0)
+            ++current_anim_frame;
+        temp_u8_1 = current_anim_frame;
+    }
     else if (player.vel_x > JOG_THRESHOLD || player.vel_x < -JOG_THRESHOLD)
         temp_u8_1 = (temp_u8_0 >> 2) & 0xF;
     else

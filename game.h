@@ -101,6 +101,7 @@ struct Player {
     unsigned char height;
 };
 const unsigned char* current_anim;
+unsigned char current_anim_frame;
 
 struct Player player = { 0x1000, 0x1200 };
 
