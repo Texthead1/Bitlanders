@@ -26,7 +26,6 @@ void main(void) {
     set_scroll_y(INIT_SCREEN_SCROLL_Y);
     ppu_on_all();
 
-
     player_setDirection(FACING_RIGHT);
     player_setGrounded(FALSE);
     oam_spr(245, 162, 0xFE, 0x01);
@@ -88,9 +87,10 @@ void main(void) {
                             TITLE_SCROLL_Y += scroll_amount[0];
                             scroll(0x00, TITLE_SCROLL_Y);
                         }
-                    } else if (TITLE_TEXT_PHASE == 33) {
-                        multi_vram_buffer_horz(clear_text, sizeof(press_start_text), PRESS_START_TEXT_POS);
-                        goto boot;
+                    } else if (TITLE_TEXT_PHASE == 31) {
+                        TITLE_MENU_STATE = 6;
+                        TITLE_TEXT_PHASE = 4;
+                        EMU_MENU_SELECTION = 0;
                     }
                     break;
                 
@@ -154,21 +154,31 @@ void main(void) {
                 case 4:
                     fourth:
                     xy_split(0x100, 0x83);
-                    if (pad1_new & PAD_UP && EMU_MENU_SELECTION) {
-                        --EMU_MENU_SELECTION;
+                    if (pad1_new & PAD_UP) {
+                        EMU_MENU_SELECTION = (EMU_MENU_SELECTION - 1) & 3;
                     }
-                    if (pad1_new & PAD_SELECT) {
+                    if (pad1_new & (PAD_SELECT | PAD_DOWN))
                         EMU_MENU_SELECTION = (EMU_MENU_SELECTION + 1) & 3;
-                    } else if (pad1_new & PAD_DOWN) {
-                        EMU_MENU_SELECTION = MIN(3, EMU_MENU_SELECTION + 1);
-                    }
 
                     oam_clear();
                     oam_spr(245, 122, 0xFE, 0x01);
                     oam_spr(48, 128 + (0x18 * EMU_MENU_SELECTION), 0xFF, 0x00);
 
                     if (pad1_new & PAD_START) {
-                        ++TITLE_MENU_STATE;
+                        switch (EMU_MENU_SELECTION) {
+                            case 0:
+                                ++TITLE_MENU_STATE;
+                                break;
+                            
+                            case 1:
+                                break;
+                            
+                            case 2:
+                                break;
+
+                            case 3:
+                                break;
+                        }
                         TITLE_TEXT_PHASE = 0;
                     }
                     break;
@@ -182,9 +192,35 @@ void main(void) {
 
                     ++TITLE_TEXT_PHASE;
 
-                    if (TITLE_TEXT_PHASE == 33) {
-                        goto boot;
+                    if (TITLE_TEXT_PHASE == 31) {
+                        TITLE_MENU_STATE = 7;
+                        TITLE_TEXT_PHASE = 4;
+                        EMU_MENU_SELECTION = 0;
                     }
+                    break;
+                case 6:
+                    if (EMU_MENU_SELECTION == 3) {
+                        EMU_MENU_SELECTION = 0;
+                        if (TITLE_TEXT_PHASE == 0)
+                            goto boot;
+                        --TITLE_TEXT_PHASE;
+                    } else {
+                        ++EMU_MENU_SELECTION;
+                    }
+                    pal_bright(TITLE_TEXT_PHASE);
+                    xy_split(0x00, 0xB3);
+                    break;
+                case 7:
+                    if (EMU_MENU_SELECTION == 3) {
+                        EMU_MENU_SELECTION = 0;
+                        if (TITLE_TEXT_PHASE == 0)
+                            goto boot;
+                        --TITLE_TEXT_PHASE;
+                    } else {
+                        ++EMU_MENU_SELECTION;
+                    }
+                    pal_bright(TITLE_TEXT_PHASE);
+                    xy_split(0x100, 0x83);
                     break;
             }
             continue;
@@ -205,10 +241,9 @@ void main(void) {
         player_old_x = player.x;
         player_old_y = player.y;
 
-        if (pad1_new & PAD_START) {
+        if (pad1_new & PAD_START && !lock_controls) {
             boot:
             if (game_state == STATE_TITLE) {
-                pal_fade_to(4, 0);
                 //pal_clear();
                 //delay(1);
                 game_state = STATE_0;
@@ -217,6 +252,8 @@ void main(void) {
                 changeScene();
                 bank_spr(1);
                 pal_fade_to(0, 4);
+                game_begun = TRUE;
+                lock_controls = TRUE;
             } else {
                 game_state = (game_state + 1) % 3;
                 changeScene();
@@ -254,7 +291,7 @@ void main(void) {
             
             // LEVEL LOADING SYSTEM
             case STATE_2:
-                if (pad1_poll & PAD_SELECT) {
+                if (pad1_poll & PAD_SELECT && !lock_controls) {
                     if (pad1_new & PAD_UP) {
                         ++level_pointer;
                         changeRoom();
@@ -370,12 +407,9 @@ void loadRoom(void) {
 }
 
 void playerMovement(void) {
-    if (pad1_poll & PAD_SELECT && pad1_new & PAD_B) {
+    if (pad1_poll & PAD_SELECT && pad1_new & PAD_B && !lock_controls) {
         player_setDebugMode(!player_isDebug());
 
-        if (!player_isDebug()) {
-            player_setGrounded(TRUE);
-        }
     }
 
     if (player_isDebug()) {
@@ -390,7 +424,7 @@ void playerMovement(void) {
         player.vel_y = 0;
 
         // if we press right, accelerate to top speed if moving right, brake if moving left
-        if (pad1_poll & PAD_RIGHT) {
+        if (pad1_poll & PAD_RIGHT && !lock_controls) {
             if (player.vel_x >= 0) {
                 player_setDirection(FACING_RIGHT);
                 player.vel_x = MIN(player.vel_x + ACCELERATION, TOP_SPEED);
@@ -401,7 +435,7 @@ void playerMovement(void) {
             }
 
         // if we press left, accelerate to negative top speed if moving left, brake if moving right
-        } else if (pad1_poll & PAD_LEFT) {
+        } else if (pad1_poll & PAD_LEFT && !lock_controls) {
             if (player.vel_x <= 0) {
                 player_setDirection(FACING_LEFT);
                 player.vel_x = MAX(player.vel_x - ACCELERATION, -TOP_SPEED);
@@ -423,7 +457,7 @@ void playerMovement(void) {
         }
 
         player_collision_y = high_byte(player.y) - 3;
-        if (pad1_new & PAD_A && !collisionUp()) {
+        if (pad1_new & PAD_A && !collisionUp() && !lock_controls) {
             player_setGrounded(FALSE);
             player.vel_y -= JUMP_FORCE;
         }
@@ -433,10 +467,10 @@ void playerMovement(void) {
         else
             player.vel_y = MIN(player.vel_y + GRAVITY, TERMINAL_VELOCITY);
 
-        if (pad1_poll & PAD_RIGHT) {
+        if (pad1_poll & PAD_RIGHT && !lock_controls) {
             player_setDirection(FACING_RIGHT);
             player.vel_x = MIN(player.vel_x + AIR_ACCEL, TOP_SPEED);
-        } else if (pad1_poll & PAD_LEFT) {
+        } else if (pad1_poll & PAD_LEFT && !lock_controls) {
             player_setDirection(FACING_LEFT);
             player.vel_x = MAX(player.vel_x - AIR_ACCEL, -TOP_SPEED);
         } else {
@@ -456,6 +490,10 @@ void playerMovement(void) {
             high_byte(player.y) = 0xA0;
             player.vel_y = 0;
             player_setGrounded(TRUE);
+            if (game_begun) {
+                game_begun = FALSE;
+                lock_controls = FALSE;
+            }
         }
     } else {
         player_collision_x = high_byte(player.x);
@@ -494,7 +532,6 @@ void playerMovement(void) {
             }
             collisionLeft();
         }
-
         playerScroll();
     }
 }

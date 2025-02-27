@@ -315,8 +315,13 @@ signed char eject_distance_reserve0;
 signed char eject_distance_reserve1;
 signed int unground_speed;
 unsigned char prev_tile_below;
+unsigned char lock_controls;
+unsigned char game_begun;
+
 #pragma bss-name(push, "BSS")
+unsigned char solo_advent;
 unsigned char collision_map[240];
+unsigned char collision_map2[240];
 
 #include "demogame.h"
 
