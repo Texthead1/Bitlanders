@@ -320,7 +320,7 @@ void changeScene(void) {
         vram_fill(0,1024);
         ppu_on_all();
         writeEmuText();
-        POKE(poke_fix + game_state + 1, 1);
+        POKE(poke_fix + game_state, 1);
     } else if (game_state == STATE_1) {
         pal_bg(echo_palette);
         pal_spr(echo_palette);
@@ -329,7 +329,7 @@ void changeScene(void) {
         vram_adr(NAMETABLE_A);
         vram_unrle(echo);
         ppu_on_all();
-        POKE(poke_fix + game_state + 1, 2);
+        POKE(poke_fix + game_state, 2);
     } else {
         pal_bg(palette);
         pal_spr(bean_palette);
@@ -337,7 +337,7 @@ void changeScene(void) {
         //cam_x = 0;
         set_scroll_x(cam_x);
         loadRoom();
-        POKE(poke_fix + game_state + 1, 1);
+        POKE(poke_fix + game_state, 1);
     }
 }
 
