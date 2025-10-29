@@ -1,7 +1,7 @@
 # Bitlanders
 ![Bitlanders logo](/bitlanders_logo_stroke.png)
 
-A personal, in-development NES game based on Skylanders, made in 6502 ASM and C (utilising [nesdoug](https://github.com/nesdoug)'s libraries).
+A personal, in-development NES game based on Skylanders, made in 6502 ASM and C (utilizing [nesdoug](https://github.com/nesdoug)'s libraries).
 
 Plans to create a custom emulator for this game to add pseudo-Portal support are in the works, but the ROM will remain fully playable outside of this as well.
 
