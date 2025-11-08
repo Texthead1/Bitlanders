@@ -337,7 +337,7 @@ struct Entity {
 
 const unsigned char palette[] = {
     0x0F, 0x00, 0x10, 0x30,
-    0x0F, 0x14, 0x22, 0x2B,
+    0x0F, 0x14, 0x21, 0x2B,
     0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00
 };
@@ -422,7 +422,7 @@ void toHexStringSigned(signed char num, char* str) {
 
 unsigned char text[0x10];
 
-#include "Levels/levels.h"
+#include "levels/levels.h"
 
 // PROTOTYPES
 void changeScene(void);

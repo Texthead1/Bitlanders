@@ -1,5 +1,5 @@
-#include "LIB/neslib.h"
-#include "LIB/nesdoug.h"
+#include "libraries/neslib.h"
+#include "libraries/nesdoug.h"
 #include "game.h"
 #include "metasprites.h"
 #include "metatiles.h"
