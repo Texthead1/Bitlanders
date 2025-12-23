@@ -319,7 +319,7 @@ unsigned char lock_controls;
 unsigned char game_begun;
 
 #pragma bss-name(push, "BSS")
-unsigned char solo_advent;
+//unsigned char solo_advent;
 unsigned char collision_map[240];
 unsigned char collision_map2[240];
 
