@@ -25,6 +25,7 @@ void main(void) {
 #define INIT_SCREEN_SCROLL_Y 0xE0
     set_scroll_y(INIT_SCREEN_SCROLL_Y);
     ppu_on_all();
+    bank_spr(1);
 
     player_setDirection(FACING_RIGHT);
     player_setGrounded(FALSE);
