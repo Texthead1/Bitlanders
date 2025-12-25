@@ -31,6 +31,7 @@ void main(void) {
     player_setGrounded(FALSE);
     oam_spr(245, 162, 0xFE, 0x01);
     temp_u16_0 = INIT_SCREEN_SCROLL_Y;
+    test_setPlayerSharedS16();
 
     game_state = STATE_TITLE;
     unground_speed = 0;

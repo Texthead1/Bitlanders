@@ -42,8 +42,8 @@ signed int cam_y;
 // PLAYER VARIABLES
 #define ACCELERATION 0x20
 #define DECELERATION 0x20
+#define TOP_SPEED shared_s16_0
 #define BRAKES 0x7A
-#define TOP_SPEED 0x320
 #define GRAVITY 0x4A
 #define JUMP_FORCE 0x540
 #define AIR_ACCEL 0x40

@@ -22,6 +22,8 @@ enum emu_state {
 unsigned char emu_flags;
 unsigned char emu_flags_prev;
 
+signed int shared_s16_0;
+
 void game_setEmu(unsigned char value) {
     emu_flags = value ? emu_flags | IS_EMU_MASK : emu_flags & ~IS_EMU_MASK;
 }
@@ -37,4 +39,8 @@ void game_setEmuState(unsigned char state) {
 
 unsigned char game_EmuState(void) {
     return (emu_flags & EMU_STATE_MASK) >> 0x01;
+}
+
+void test_setPlayerSharedS16(void) {
+    shared_s16_0 = 0x280;
 }
