@@ -3,7 +3,7 @@
 #include "game.h"
 #include "metasprites.h"
 #include "metatiles.h"
-#include "echo.h"
+#include "screens/echo.h"
 #include "title.h"
 
 #define XPOS 6

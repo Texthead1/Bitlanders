@@ -1,5 +1,5 @@
 # Bitlanders
-![Bitlanders logo](/bitlanders_logo_stroke.png)
+![Bitlanders logo](/media/bitlanders_logo_stroke.png)
 
 A personal, in-development NES game based on Skylanders, made in 6502 ASM and C (utilizing [nesdoug](https://github.com/nesdoug)'s libraries).
 
