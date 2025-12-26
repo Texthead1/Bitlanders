@@ -1,6 +1,6 @@
 #pragma bss-name(push, "ZEROPAGE")
 
-#include "SkyRetro/skyretro.h"
+#include "../lib/libskyretro/skyretro.h"
 
 // GLOBAL VARIABLES //
 signed char temp_s8_0;
@@ -383,7 +383,7 @@ void toHexStringSigned(signed char num, char* str) {
 
 unsigned char text[0x10];
 
-#include "screens/levels.h"
+#include "levels.h"
 
 // PROTOTYPES
 void changeScene(void);

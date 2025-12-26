@@ -252,9 +252,9 @@ detectNTSC:
 
 	jmp _main			;no parameters
 
-	.include "neslib.s"
-	.include "nesdoug.s"
-	.include "famitone2.s"
+	.include "../lib/libnes/neslib.s"
+	.include "../lib/nesdoug/nesdoug.s"
+	.include "../lib/famitone2.s"
 	
 	
 	
@@ -284,6 +284,6 @@ sounds_data:
 
 
 .segment "CHARS"
-	.incbin "../chrrom/title.chr"
-	.incbin "../chrrom/test.chr"
-	.incbin "../chrrom/echo.chr"
+	.incbin "../assets/chrrom/title.chr"
+	.incbin "../assets/chrrom/test.chr"
+	.incbin "../assets/chrrom/echo.chr"

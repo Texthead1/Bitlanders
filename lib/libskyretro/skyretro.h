@@ -42,5 +42,5 @@ unsigned char game_EmuState(void) {
 }
 
 void test_setPlayerSharedS16(void) {
-    shared_s16_0 = 0x280;
+    shared_s16_0 = 0x300;
 }
