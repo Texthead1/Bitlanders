@@ -261,7 +261,7 @@ detectNTSC:
 .segment "RODATA"
 
 music_data:
-	;.include "music.s"
+	.include "../assets/music/molekin_mine.s"
 
 
 

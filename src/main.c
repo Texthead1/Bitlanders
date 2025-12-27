@@ -24,7 +24,6 @@ void main(void) {
 
 #define INIT_SCREEN_SCROLL_Y 0xE0
     set_scroll_y(INIT_SCREEN_SCROLL_Y);
-    ppu_on_all();
     bank_spr(1);
 
     player_setDirection(FACING_RIGHT);
@@ -35,6 +34,10 @@ void main(void) {
 
     game_state = STATE_TITLE;
     unground_speed = 0;
+
+    music_play(0);
+
+    ppu_on_all();
 
 #undef INIT_SCREEN_SCROLL_Y
 
