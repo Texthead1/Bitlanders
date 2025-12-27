@@ -36,7 +36,6 @@ void main(void) {
     unground_speed = 0;
 
     music_play(0);
-
     ppu_on_all();
 
 #undef INIT_SCREEN_SCROLL_Y
@@ -74,7 +73,7 @@ void main(void) {
                         emu_flags_prev = emu_flags;
                     }
                     break;
-                
+
                 case 1:
                     xy_split(0x00, 0xB3);
                     if ((TITLE_TEXT_PHASE) & 2) {
@@ -98,7 +97,7 @@ void main(void) {
                         EMU_MENU_SELECTION = 0;
                     }
                     break;
-                
+
                 case 2:
                     switch (TITLE_TEXT_PHASE) {
                         case 0:
@@ -125,7 +124,7 @@ void main(void) {
                     xy_split(0x0, 0xB3);
                     ++TITLE_TEXT_PHASE;
                     break;
-                
+
                 case 3:
                     third:
                     switch (TITLE_TEXT_PHASE) {
@@ -155,7 +154,7 @@ void main(void) {
                     xy_split(0x100, 0x83);
                     ++TITLE_TEXT_PHASE;
                     break;
-                
+
                 case 4:
                     fourth:
                     xy_split(0x100, 0x83);
@@ -187,6 +186,7 @@ void main(void) {
                         TITLE_TEXT_PHASE = 0;
                     }
                     break;
+
                 case 5:
                     xy_split(0x100, 0x83);
                     if ((TITLE_TEXT_PHASE) & 2) {
@@ -203,6 +203,7 @@ void main(void) {
                         EMU_MENU_SELECTION = 0;
                     }
                     break;
+
                 case 6:
                     if (EMU_MENU_SELECTION == 3) {
                         EMU_MENU_SELECTION = 0;
@@ -215,6 +216,7 @@ void main(void) {
                     pal_bright(TITLE_TEXT_PHASE);
                     xy_split(0x00, 0xB3);
                     break;
+
                 case 7:
                     if (EMU_MENU_SELECTION == 3) {
                         EMU_MENU_SELECTION = 0;
@@ -255,6 +257,7 @@ void main(void) {
                 set_vram_buffer();
                 oam_clear();
                 changeScene();
+                music_stop();
                 bank_spr(1);
                 pal_fade_to(0, 4);
                 game_begun = TRUE;
@@ -282,7 +285,7 @@ void main(void) {
                     writeEmuText();
                 }
                 break;
-            
+
             // ECHO DEMO SCENE
             case STATE_1:
                 oam_clear();
@@ -293,7 +296,7 @@ void main(void) {
                 playerMovement();
                 drawPlayer();
                 break;
-            
+
             // LEVEL LOADING SYSTEM
             case STATE_2:
                 if (pad1_poll & PAD_SELECT && !lock_controls) {
@@ -307,7 +310,7 @@ void main(void) {
                 }
                 oam_clear();
                 playerMovement();
-                drawPlayer();                
+                drawPlayer();
                 break;
         }
         emu_flags_prev = emu_flags;

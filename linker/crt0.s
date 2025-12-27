@@ -259,29 +259,22 @@ detectNTSC:
 	
 	
 .segment "RODATA"
+	.global _demo_input
+_demo_input:
+	.incbin "../demogame/demo.bin"
 
 music_data:
 	.include "../assets/music/molekin_mine.s"
-
-
 
 	.if(FT_SFX_ENABLE)
 sounds_data:
 	;.include "sound.s"
 	.endif
-
-	
-	
-.segment "SAMPLES"
-;	.incbin "music_dpcm.bin"
-
-
 .segment "VECTORS"
 
     .word nmi	;$fffa vblank nmi
     .word start	;$fffc reset
    	.word irq	;$fffe irq / brk
-
 
 .segment "CHARS"
 	.incbin "../assets/chrrom/title.chr"

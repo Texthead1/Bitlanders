@@ -284,7 +284,8 @@ unsigned char game_begun;
 unsigned char collision_map[240];
 unsigned char collision_map2[240];
 
-#include "demogame.h"
+extern const unsigned char demo_input[];
+unsigned char demo_counter;
 
 // ENTITY VARIABLES
 struct Entity {
