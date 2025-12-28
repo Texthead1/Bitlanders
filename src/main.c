@@ -70,7 +70,7 @@ void main(void) {
                     } else if (pad1_new & PAD_SELECT) {
                         game_setEmu(TRUE);
                         game_setEmuState(EMU_STATE_REGULAR);
-                        emu_flags_prev = emu_flags;
+                        skyRetro_update();
                     }
                     break;
 
@@ -277,7 +277,7 @@ void main(void) {
                 playerMovement();
                 drawPlayer();
 
-                if (emu_flags != emu_flags_prev) {
+                if (skyRetro_flagsChanged()) {
                     ppu_off();
                     vram_adr(NAMETABLE_A);
                     vram_fill(0,1024);
@@ -313,7 +313,7 @@ void main(void) {
                 drawPlayer();
                 break;
         }
-        emu_flags_prev = emu_flags;
+        skyRetro_update();
     }
 }
 

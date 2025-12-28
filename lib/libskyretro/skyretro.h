@@ -1,3 +1,12 @@
+// libskyretro
+// declares some fields in the zeropage for fast access, managed by skyretro
+// skyretro also provides systems for interfacing with nes rom fields via an output .label file from the linker
+// we reserve some bytes in the zeropage for skyretro use, these are related to the portal state
+// skyretro uses its own address space for its other variables that aren't as performance critical
+// this range is between $5000 and $51FF
+
+#define IS_SKYRETRO_EMU (*(volatile unsigned char*)0x5000)
+
 // EMULATION VARIABLES
 #define IS_EMU_MASK 0b00000001
 #define EMU_STATE_MASK 0b00000110
@@ -23,6 +32,14 @@ unsigned char emu_flags;
 unsigned char emu_flags_prev;
 
 signed int shared_s16_0;
+
+void skyRetro_update(void) {
+    emu_flags_prev = emu_flags;
+}
+
+unsigned char skyRetro_flagsChanged(void) {
+    return emu_flags != emu_flags_prev;
+}
 
 void game_setEmu(unsigned char value) {
     emu_flags = value ? emu_flags | IS_EMU_MASK : emu_flags & ~IS_EMU_MASK;

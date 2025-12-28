@@ -1,8 +1,6 @@
 ; Startup code for cc65 and Shiru's NES library
 ; based on code by Groepaz/Hitmen <groepaz@gmx.net>, Ullrich von Bassewitz <uz@cc65.org>
 
-
-
 FT_BASE_ADR		= $0100		;page in RAM, should be $xx00
 FT_DPCM_OFF		= $f000		;$c000..$ffc0, 64-byte steps
 FT_SFX_STREAMS	= 1			;number of sound effects played at once, 1..4
@@ -12,10 +10,6 @@ FT_PAL_SUPPORT	= 1		;undefine to exclude PAL support
 FT_NTSC_SUPPORT	= 1		;undefine to exclude NTSC support
 FT_DPCM_ENABLE  = 0		;undefine to exclude all DMC code
 FT_SFX_ENABLE   = 1		;undefine to exclude all sound effects code
-
-
-
-
 
 ;REMOVED initlib
 ;this called the CONDES function
@@ -34,11 +28,6 @@ FT_SFX_ENABLE   = 1		;undefine to exclude all sound effects code
 	.importzp _PAD_STATE, _PAD_STATET ;added
     .include "zeropage.inc"
 
-
-
-
-
-
 PPU_CTRL	=$2000
 PPU_MASK	=$2001
 PPU_STATUS	=$2002
@@ -56,8 +45,6 @@ CTRL_PORT2	=$4017
 OAM_BUF		=$0200
 PAL_BUF		=$01c0
 VRAM_BUF	=$0700
-
-
 
 .segment "ZEROPAGE"
 
@@ -106,10 +93,6 @@ VRAM_INDEX:			.res 1
 META_PTR:			.res 2
 DATA_PTR:			.res 2
 
-
-
-
-
 .segment "HEADER"
 
     .byte $4e,$45,$53,$1a
@@ -118,8 +101,6 @@ DATA_PTR:			.res 2
 	.byte <NES_MIRRORING|(<NES_MAPPER<<4)
 	.byte <NES_MAPPER&$f0
 	.res 8,0
-
-
 
 .segment "STARTUP"
 
@@ -255,9 +236,7 @@ detectNTSC:
 	.include "../lib/libnes/neslib.s"
 	.include "../lib/nesdoug/nesdoug.s"
 	.include "../lib/famitone2.s"
-	
-	
-	
+
 .segment "RODATA"
 	.global _demo_input
 _demo_input:
@@ -271,7 +250,6 @@ sounds_data:
 	;.include "sound.s"
 	.endif
 .segment "VECTORS"
-
     .word nmi	;$fffa vblank nmi
     .word start	;$fffc reset
    	.word irq	;$fffe irq / brk
