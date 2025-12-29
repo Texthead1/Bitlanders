@@ -1,10 +1,4 @@
-#include "../lib/libnes/neslib.h"
-#include "../lib/nesdoug/nesdoug.h"
 #include "main.h"
-#include "metasprites.h"
-#include "metatiles.h"
-#include "echo.h"
-#include "title.h"
 
 #define XPOS 6
 #define YPOS 8

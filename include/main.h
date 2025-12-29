@@ -1,6 +1,12 @@
-#pragma bss-name(push, "ZEROPAGE")
-
+#include "../lib/libnes/neslib.h"
+#include "../lib/nesdoug/nesdoug.h"
 #include "../lib/libskyretro/skyretro.h"
+#include "metasprites.h"
+#include "metatiles.h"
+#include "echo.h"
+#include "title.h"
+
+#pragma bss-name(push, "ZEROPAGE")
 
 // GLOBAL VARIABLES //
 signed char temp_s8_0;

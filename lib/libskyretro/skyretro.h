@@ -28,8 +28,10 @@ enum emu_state {
 // bit 0    - game is informed of emulation
 // bits 1-2 - state of emulation (for use with portal)
 // bits 3-7 - unused
-unsigned char emu_flags;
-unsigned char emu_flags_prev;
+extern volatile unsigned char emu_flags;
+#pragma zpsym ("emu_flags");
+extern volatile unsigned char emu_flags_prev;
+#pragma zpsym ("emu_flags_prev");
 
 signed int shared_s16_0;
 
