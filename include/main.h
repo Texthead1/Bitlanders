@@ -19,12 +19,12 @@ unsigned int temp_u16_0;
 unsigned int temp_u16_1;
 
 // GAME VARIABLES
-enum game_state {
+typedef enum {
     STATE_0,
     STATE_1,
     STATE_2,
     STATE_TITLE
-};
+} GameState;
 
 unsigned char game_state;
 unsigned char i;
@@ -56,7 +56,7 @@ signed int cam_y;
 #define AIR_DRAG 0x14
 #define TERMINAL_VELOCITY 0x500
 
-struct Player {
+typedef struct {
     unsigned int x;
     unsigned int y;
     signed int vel_x;
@@ -66,11 +66,11 @@ struct Player {
     unsigned char anim_timer;
     unsigned char width;
     unsigned char height;
-};
+} Player;
 const unsigned char* current_anim;
 unsigned char current_anim_frame;
 
-struct Player player = { 0x1000, 0x1200 };
+Player player = { 0x1000, 0x0000 };
 
 #define GROUNDED_MASK 0b00000001
 #define FACING_MASK 0b00000010
@@ -78,29 +78,14 @@ struct Player player = { 0x1000, 0x1200 };
 #define FACING_LEFT 0
 #define FACING_RIGHT 1
 
-void player_setGrounded(unsigned char grounded) {
-    player.flags = grounded ? player.flags | GROUNDED_MASK : player.flags & ~GROUNDED_MASK;
-}
+#define PLAYER_SET_GROUNDED(grounded) (player.flags = grounded ? player.flags | GROUNDED_MASK : player.flags & ~GROUNDED_MASK)
+#define PLAYER_IS_GROUNDED (player.flags & GROUNDED_MASK)
 
-unsigned char player_IsGrounded(void) {
-    return player.flags & GROUNDED_MASK;
-}
+#define PLAYER_SET_DIRECTION(direction) (player.flags = direction ? player.flags | FACING_MASK : player.flags & ~FACING_MASK)
+#define PLAYER_FACING_RIGHT (player.flags & FACING_MASK)
 
-void player_setDirection(unsigned char direction) {
-    player.flags = direction ? player.flags | FACING_MASK : player.flags & ~FACING_MASK;
-}
-
-unsigned char player_facingRight(void) {
-    return player.flags & FACING_MASK;
-}
-
-void player_setDebugMode(unsigned char value) {
-    player.flags = value ? player.flags | DEBUG_MASK : player.flags & ~DEBUG_MASK;
-}
-
-unsigned char player_isDebug(void) {
-    return player.flags & DEBUG_MASK;
-}
+#define PLAYER_SET_DEBUG(value) (player.flags = value ? player.flags | DEBUG_MASK : player.flags & ~DEBUG_MASK);
+#define PLAYER_IS_DEBUG (player.flags & DEBUG_MASK)
 
 // COLLISION VARIABLES
 #define TILE_CMODE_MASK      0b11
@@ -293,13 +278,15 @@ unsigned char collision_map2[240];
 extern const unsigned char demo_input[];
 unsigned char demo_counter;
 
+unsigned char profile;
+
 // ENTITY VARIABLES
-struct Entity {
+typedef struct {
     unsigned int x;
     unsigned int y;
     unsigned char width;
     unsigned char height;
-};
+} Entity;
 
 #define ENTITY_QUEUE_MAX 0x10
 
@@ -316,8 +303,6 @@ const unsigned char bean_palette[] = {
     0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00
 };
-
-const unsigned char poke_fix[] = { 0, 1, 2, 1 };
 
 const unsigned char reg[] = "Regular playback";
 const unsigned char emu[] = "Regular emulation";
@@ -393,23 +378,23 @@ unsigned char text[0x10];
 #include "levels.h"
 
 // PROTOTYPES
-void changeScene(void);
-void writeEmuText(void);
-void changeRoom(void);
-void loadRoom(void);
-void playerMovement(void);
-void debugMovement(void);
-void playerScroll(void);
-char evaluateCollisionLeft(void);
-char collisionLeft(void);
-char collisionLeftGround(void);
-char evaluateCollisionRight(void);
-char collisionRight(void);
-char collisionRightGround(void);
-char collisionUp(void);
-char collisionDown(void);
-void calculateEjectDistanceLeft(signed char*);
-void calculateEjectDistanceRight(signed char*);
-void calculateEjectDistanceUp(signed char*);
-void calculateEjectDistanceDown(signed char*);
-void drawPlayer(void);
+void change_scene(void);
+void write_emu_text(void);
+void change_room(void);
+void load_room(void);
+void player_movement(void);
+void debug_movement(void);
+void player_scroll(void);
+char evaluate_collision_left(void);
+char collision_left(void);
+char collision_left_ground(void);
+char evaluate_collision_right(void);
+char collision_right(void);
+char collision_right_ground(void);
+char collision_up(void);
+char collision_down(void);
+void calculate_eject_distance_left(signed char*);
+void calculate_eject_distance_right(signed char*);
+void calculate_eject_distance_up(signed char*);
+void calculate_eject_distance_down(signed char*);
+void draw_player(void);

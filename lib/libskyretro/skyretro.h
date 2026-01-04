@@ -3,9 +3,10 @@
 // SkyRetro also provides systems for interfacing with nes rom fields via an output labels file from the linker
 // we reserve some bytes in the zeropage for SkyRetro use, these are related to the portal state
 // SkyRetro uses its own address space for its other variables that aren't as performance critical
-// this range is between $5000 and $51FF
+// this range is between $4020 and 4FFF (range $4020-$5FFF is reserved for mappers)
+// using $5000 conflicts with MMC5; $4020-$4FFF is safer for SkyRetro
 
-#define IS_SKYRETRO_EMU (*(volatile unsigned char*)0x5000)
+#define IS_SKYRETRO_EMU (*(volatile unsigned char*)0x4020)
 
 // EMULATION VARIABLES
 #define IS_EMU_MASK 0b00000001
@@ -35,31 +36,31 @@ extern volatile unsigned char emu_flags_prev;
 
 signed int shared_s16_0;
 
-void skyRetro_update(void) {
+void skyretro_update(void) {
     emu_flags_prev = emu_flags;
 }
 
-unsigned char skyRetro_flagsChanged(void) {
+unsigned char skyretro_flags_changed(void) {
     return emu_flags != emu_flags_prev;
 }
 
-void game_setEmu(unsigned char value) {
+void skyretro_set_emu(unsigned char value) {
     emu_flags = value ? emu_flags | IS_EMU_MASK : emu_flags & ~IS_EMU_MASK;
 }
 
-unsigned char game_isEmu(void) {
+unsigned char skyretro_is_emu(void) {
     return emu_flags & IS_EMU_MASK;
 }
 
-void game_setEmuState(unsigned char state) {
+void skyretro_set_emu_state(unsigned char state) {
     emu_flags &= ~EMU_STATE_MASK;
     emu_flags |= (state << 0x01) & EMU_STATE_MASK;
 }
 
-unsigned char game_EmuState(void) {
+unsigned char skyretro_emu_state(void) {
     return (emu_flags & EMU_STATE_MASK) >> 0x01;
 }
 
-void test_setPlayerSharedS16(void) {
+void skyretro_set_test_shared_s16(void) {
     shared_s16_0 = 0x300;
 }
