@@ -3,8 +3,8 @@
 // SkyRetro also provides systems for interfacing with nes rom fields via an output labels file from the linker
 // we reserve some bytes in the zeropage for SkyRetro use, these are related to the portal state
 // SkyRetro uses its own address space for its other variables that aren't as performance critical
-// this range is between $4020 and 4FFF (range $4020-$5FFF is reserved for mappers)
-// using $5000 conflicts with MMC5; $4020-$4FFF is safer for SkyRetro
+// this range is between $4020 and $4FFF (range $4020-$5FFF is reserved for mappers)
+// using $5000-$5FFF conflicts with MMC5 and many other mappers; $4020-$4FFF is less used and thus generally safer for SkyRetro
 
 #define IS_SKYRETRO_EMU (*(volatile unsigned char*)0x4020)
 
@@ -12,7 +12,7 @@
 #define IS_EMU_MASK 0b00000001
 #define EMU_STATE_MASK 0b00000110
 
-enum emu_state {
+typedef enum {
     EMU_STATE_REGULAR = 0x00,
     /*
      * @brief Alerts when the external magic moment is active
@@ -23,7 +23,7 @@ enum emu_state {
      */
     EMU_STATE_PORTAL = 0x02,
     EMU_STATE_MISC = 0x03
-};
+} EmuState;
 
 // Flags:
 // bit 0    - game is informed of emulation

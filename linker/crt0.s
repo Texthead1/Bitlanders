@@ -255,6 +255,10 @@ sounds_data:
    	.word irq	;$fffe irq / brk
 
 .segment "CHARS"
-	.incbin "../assets/chrrom/title.chr"
-	.incbin "../assets/chrrom/test.chr"
-	.incbin "../assets/chrrom/echo.chr"
+	.incbin "../assets/chr/title.chr"
+	.incbin "../assets/chr/test.chr"
+	.incbin "../assets/chr/echo.chr"
+
+; libskyretro here instead of compiling down to an independent object and referencing in the linker manually
+.segment "CODE"
+	.include "../lib/libskyretro/skyretro.s"
