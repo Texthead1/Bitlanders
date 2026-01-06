@@ -3,6 +3,9 @@
 #define XPOS 6
 #define YPOS 8
 
+#pragma rodata-name ("CODE")
+#pragma code-name ("CODE")	
+
 void main(void) {
     ppu_off();
     pal_spr(title_palette_sprites);

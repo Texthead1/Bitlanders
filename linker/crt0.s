@@ -1,6 +1,8 @@
 ; Startup code for cc65 and Shiru's NES library
 ; based on code by Groepaz/Hitmen <groepaz@gmx.net>, Ullrich von Bassewitz <uz@cc65.org>
 
+.define SOUND_BANK 12
+
 FT_BASE_ADR		= $0100		;page in RAM, should be $xx00
 FT_DPCM_OFF		= $f000		;$c000..$ffc0, 64-byte steps
 FT_SFX_STREAMS	= 1			;number of sound effects played at once, 1..4
@@ -43,11 +45,13 @@ CTRL_PORT1	=$4016
 CTRL_PORT2	=$4017
 
 OAM_BUF		=$0200
-PAL_BUF		=$01c0
+;PAL_BUF	=$01c0
 VRAM_BUF	=$0700
 
-.segment "ZEROPAGE"
+.segment "BSS"
+PAL_BUF: .res 32
 
+.segment "ZEROPAGE"
 NTSC_MODE: 			.res 1
 FRAME_CNT1: 		.res 1
 FRAME_CNT2: 		.res 1
@@ -94,13 +98,28 @@ META_PTR:			.res 2
 DATA_PTR:			.res 2
 
 .segment "HEADER"
-
     .byte $4e,$45,$53,$1a
 	.byte <NES_PRG_BANKS
 	.byte <NES_CHR_BANKS
 	.byte <NES_MIRRORING|(<NES_MAPPER<<4)
 	.byte <NES_MAPPER&$f0
-	.res 8,0
+	.byte 1	; PRG RAM bank for MMC3
+	.res 7,0
+
+.segment "ONCE"
+.segment "BANK0"
+.segment "BANK1"
+.segment "BANK2"
+.segment "BANK3"
+.segment "BANK4"
+.segment "BANK5"
+.segment "BANK6"
+.segment "BANK7"
+.segment "BANK8"
+.segment "BANK9"
+.segment "BANK10"
+.segment "BANK11"
+.segment "BANK12"
 
 .segment "STARTUP"
 
@@ -117,6 +136,8 @@ _exit:
     stx PPU_MASK
     stx DMC_FREQ
     stx PPU_CTRL		;no NMI
+
+	jsr _disable_irq ;disable mmc3 IRQ
 
 initPPU:
     bit PPU_STATUS
@@ -165,6 +186,55 @@ clearRAM:
     inx
     bne @1
 
+; append mmc3 setup here
+
+; MMC3 reset
+; todo: move out of crt0, into engine
+
+; set which bank at $8000
+; also $c000 fixed to 14 of 15
+	lda #0 ; PRG bank zero
+	jsr _set_prg_8000
+
+; set which bank at $a000
+	lda #13 ; PRG bank 13 of 15
+	jsr _set_prg_a000
+	
+; with CHR invert, set $0000-$03FF
+	lda #0
+	jsr _set_chr_mode_2
+
+; with CHR invert, set $0400-$07FF
+	lda #1
+	jsr _set_chr_mode_3
+
+; with CHR invert, set $0800-$0BFF
+	lda #2
+	jsr _set_chr_mode_4
+
+; with CHR invert, set $0C00-$0FFF
+	lda #3
+	jsr _set_chr_mode_5
+
+; with CHR invert, set $1000-$17FF
+	lda #4
+	jsr _set_chr_mode_0
+
+; with CHR invert, set $1800-$1FFF
+	lda #6
+	jsr _set_chr_mode_1
+
+; set mirroring to vertical, no good reason	
+	lda #0
+	jsr _set_mirroring
+
+; allow reads and writes to WRAM	
+	lda #$80 ;WRAM_ON 0x80
+	jsr _set_wram_mode
+	
+	cli ; allow irq's to happen on the 6502 chip	
+		; however, the mmc3 IRQ was disabled above
+
 	lda #4
 	jsr _pal_bright
 	jsr _pal_clear
@@ -177,9 +247,6 @@ clearRAM:
     sta	sp
     lda	#>(__STACK_START__+__STACKSIZE__)
     sta	sp+1            ; Set argument stack ptr
-
-;	jsr	initlib
-; removed. this called the CONDES function
 
 	lda #%10000000
 	sta <PPU_CTRL_VAR
@@ -212,6 +279,19 @@ detectNTSC:
 	ldx #0
 	jsr _set_vram_update
 
+	lda #$fd
+	sta <RAND_SEED
+	sta <RAND_SEED+1
+
+	lda #0
+	sta PPU_SCROLL
+	sta PPU_SCROLL
+
+; change to sound bank before FamiTone init
+
+	lda #SOUND_BANK
+	jsr _set_prg_8000
+
 	ldx #<music_data
 	ldy #>music_data
 	lda <NTSC_MODE
@@ -223,32 +303,26 @@ detectNTSC:
 	jsr FamiToneSfxInit
 	.endif
 
-	lda #$fd
-	sta <RAND_SEED
-	sta <RAND_SEED+1
-
-	lda #0
-	sta PPU_SCROLL
-	sta PPU_SCROLL
+	lda #$00 ;PRG bank #0 at $8000, back to basic
+	jsr _set_prg_8000
 
 	jmp _main			;no parameters
 
+	.include "../engine/mapper/mmc3/mmc3_code.asm"
 	.include "../lib/libnes/neslib.s"
 	.include "../lib/nesdoug/nesdoug.s"
-	.include "../lib/famitone2.s"
 
 .segment "RODATA"
 	.global _demo_input
 _demo_input:
 	.incbin "../demogame/demo.bin"
 
+.segment "BANK12"
 music_data:
 	.include "../assets/music/molekin_mine.s"
 
-	.if(FT_SFX_ENABLE)
 sounds_data:
-	;.include "sound.s"
-	.endif
+
 .segment "VECTORS"
     .word nmi	;$fffa vblank nmi
     .word start	;$fffc reset
@@ -259,6 +333,6 @@ sounds_data:
 	.incbin "../assets/chr/test.chr"
 	.incbin "../assets/chr/echo.chr"
 
-; libskyretro here instead of compiling down to an independent object and referencing in the linker manually
 .segment "CODE"
+	.include "../lib/famitone2.s"
 	.include "../lib/libskyretro/skyretro.s"
