@@ -3,6 +3,7 @@
 #include "../lib/libskyretro/skyretro.h"
 #include "../engine/mapper/mmc3/mmc3_code.h"
 #include "../engine/mapper/mmc3/mmc3_code.c"
+#include "portal/portal_init.h"
 #include "metasprites.h"
 #include "metatiles.h"
 #include "echo.h"
