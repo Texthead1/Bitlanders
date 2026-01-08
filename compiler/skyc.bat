@@ -1,2 +1,2 @@
 @echo off
-python "%~dp0src/skyc.py" %*
+python "%~dp0bin/skyc.py" %*

@@ -73,7 +73,7 @@ def compile_function(lines):
 # which wraps the skyasm machine code as .byte directives
 def emit_proc(name, mcode):
     out = []
-    out.append(f".export _{name}\n")
+    out.append(f".export _{name}\n")		
     out.append(f".segment \"CODE\"\n")
     out.append(f"; callable in C as: void {name}(void);")
     out.append(f"_{name}:")
@@ -109,7 +109,7 @@ def emit_header(name, functions):
 def wrap_skyasm():
     global base_name
 
-    if VERBOSE: print(f"Wrapping file: {base_name}{SKYASM_EXT}")
+    if VERBOSE: print(f"Handling file: {base_name}{SKYASM_EXT}")
     with open(base_name + SKYASM_EXT, "r") as f:
         lines = f.readlines()
     
@@ -167,24 +167,46 @@ def handle_file(file):
     base_name = os.path.splitext(file)[0]
     wrap_skyasm()
 
-def wrap_all():
-    for root, dirs, files in os.walk('.'):
+def assemble():
+    out_files = []
+    obj_list = []
+    for root, _, files in os.walk('.'):
         for filename in files:
             if filename.endswith(SKYASM_EXT):
+                print("Assembling file: " + filename)
                 handle_file(os.path.join(root, filename))
+                print(f"Assembled: {filename}")
+                out_files.append(os.path.join(root.removeprefix(".\\"), os.path.splitext(filename)[0] + CA65ASM_EXT))
+                obj_list.append(os.path.join(root.removeprefix(".\\"), os.path.splitext(filename)[0] + ".o"))
 
-# we wanna grab the original .sky.s file and remove the wrapped .s file
-# then change the extension of the original from .sky.s to .s
+    print(f"Assembled {len(out_files)} files.")
+    if len(out_files) == 0: return
+    
+    with open("skyc_assembled.txt", "w") as f:
+        print("\n".join(out_files))
+        f.write("\n".join(out_files))
+    
+    with open("skyc_objlist.txt", "w") as f:
+        print("\n".join(obj_list))
+        f.write("\n".join(obj_list))
+
+# we wanna grab the original .ssa file and remove the corresponding .s file
 def clean_skyasm(file):
     base_name = os.path.splitext(file)[0]
     if VERBOSE: print(f"Cleaning file: {base_name}{CA65ASM_EXT}")
     os.remove(base_name + CA65ASM_EXT)
 
-def clean_all():
-    for root, dirs, files in os.walk('.'):
+def clean():
+    for root, _, files in os.walk('.'):
         for filename in files:
             if filename.endswith(SKYASM_EXT):
                 clean_skyasm(os.path.join(root, filename))
+            elif filename == "skyc_assembled.txt":
+                if VERBOSE: print(f"Removing file: {filename}")
+                os.remove(filename)
+            elif filename == "skyc_objlist.txt":
+                if VERBOSE: print(f"Removing file: {filename}")
+                os.remove(filename)
 
 def help():
     print("Usage: python skyc.py [--asmc | --clean] [--verbose]")
@@ -206,16 +228,16 @@ if __name__ == "__main__":
 
     match sys.argv[1]:
         case "--asmc":
-            wrap_all()
+            assemble()
 
         case "-a":
-            wrap_all()
+            assemble()
 
         case "--clean":
-            clean_all()
+            clean()
         
         case "-c":
-            clean_all()
+            clean()
 
         case _:
             print(f"Unknown argument: {sys.argv[1]}")
