@@ -1,6 +1,6 @@
 # SkyASM Opcodes
 
-The SkyRetro Peripheral Interface Controller (SPIC) has 3 registers: `R`, `G`, and `B`.s
+The SkyRetro Peripheral Interface Controller (SPIC) has 3 registers: `R`, `G`, and `B`.
 
 Opcode (Hex) | Size | Mnemonic | Information
 -------------|------|----------|------------
@@ -50,6 +50,57 @@ F0           | 1    | WAIL     | Get the amount of wait ticks remaining, fetch v
 F4           | 1    | BUFL     | Get the amount of instructions in the buffer, fetch via SKYRETRO_CMD_OUT
 FA           | 1    | NOP      | No operation
 
+## Byte-level instruction encoding
+The SkyASM byte-level semantic instructions are constructed in hex as so:
+
+Bits     | Meaning
+---------|--------
+Bit 7    | Logical alternate flag
+Bits 6-4 | Category (0-7)
+Bits 3-0 | Action within Category (0-15)
+
+This structure gives each category up to 16 actions, and each action has 2 logical variants (primary and alternate).
+
+### High Nibble
+The high nibble is divided into:
+
+#### Logical Alternate flag (bit 7)
+- `0` uses the primary category
+- `1` uses the alternate category
+
+The alternate category contains logically relevant alternatives, either inverted or complimentary instructions. For example:
+- `50` (`0101 0000`) is INR (increment R register)
+- `D0` (`1101 0000`) is DER (decrement R register)
+    - Both share the same category, and have the same action, but differ in bit 7.
+
+#### Categories (bits 6-4)
+ID  | Category
+----|---------
+000 | Antenna/Peripheral Control
+001 | System/Reset
+010 | LEDs
+011 | Elemental Color Operations
+100 | Extended LEDs
+101 | Register Arithmetic
+110 | Speaker/Audio
+111 | SPIC Control
+
+#### Low Nibble
+The lower nibble selects the action within the category.
+
+Examples from category `010` (LED / RGB):
+
+Opcode (Hex) | Mnemonic | Category | Action
+-------------|----------|----------|-------
+20           | RGB      | 010      | 0000
+21           | LDR      | 010      | 0001
+22           | LDG      | 010      | 0010
+23           | LDB      | 010      | 0011
+28           | COL      | 010      | 1000
+A8           | BCOL     | 010      | 1000
+
+Note that `28` and `A8` share the same action (`1000`), but differ in bit 7.
+
 ## Addressing Modes
 `#` loads an immediate value
 > For instance, `LDR #$40` would load `0x40` into the R register.
@@ -84,7 +135,7 @@ ID | Element
 
 As an example, using the instruction `ELM #$04` would give the same outcome as `ELFI` (set LED to the Fire element color).
 
-Using `ELM #$00` will set the LED to RGB `#000000`, unless a proper entry is added to the firmware for element `0`. Values above `0B` is normally undefined behavior and will do nothing.
+Using `ELM #$00` will set the LED to RGB `#000000`, unless a proper entry is added to the firmware for element `0`. Using values above `0B` is normally undefined behavior and will do nothing.
 
 Additional elements can be taken advantage of with this system, given:
 - A new color entry is made for said additional element (e.g. `OC`)
