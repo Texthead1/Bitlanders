@@ -1,8 +1,6 @@
 # SkyASM Opcodes
 
-The SkyRetro Peripheral Interface Processor (SRPIP) has 3 registers: `R`, `G`, and `B`.
-
-The SRPIP firmware additionally contains RGB entries for each element, so that the peripheral's LED can be changed to a predefined color based on element.
+The SkyRetro Peripheral Interface Controller (SPIC) has 3 registers: `R`, `G`, and `B`.s
 
 Opcode (Hex) | Size | Mnemonic | Information
 -------------|------|----------|------------
@@ -13,7 +11,7 @@ Opcode (Hex) | Size | Mnemonic | Information
 22           | 2    | LDG      | Load a value into the G register
 23           | 2    | LDB      | Load a value into the B register
 28           | 4    | COL      | Set the RGB of the peripheral's LED based on the operands (RGB order)
-30           | 2    | ELM      | Set the peripheral's LED based on a given elemental index. ([see more](#elemental-color-index))
+30           | 2    | ELM      | Set the peripheral's LED based on a given elemental index ([see more](#elemental-color-index))
 31           | 2    | ELER     | Set the peripheral's LED to the corresponding RGB for the Earth element
 32           | 2    | ELWA     | Set the peripheral's LED to the corresponding RGB for the Water element
 33           | 2    | ELAI     | Set the peripheral's LED to the corresponding RGB for the Air element
@@ -29,8 +27,8 @@ Opcode (Hex) | Size | Mnemonic | Information
 41           | 1    | RGBR     | If supported, set the peripheral's right LED based on the R, G, and B registers
 42           | 1    | RGBT     | If supported, set the peripheral's Trap Slot LED based on the R register
 48           | 4    | COLL     | If supported, set the peripheral's left LED based on the operands (RGB order)
-49           | 4    | COLR     | If supported, set the peripheral's left LED based on the operands (RGB order)
-4A           | 2    | TRP      | If supported, set the peripheral's left LED based on the operand
+49           | 4    | COLR     | If supported, set the peripheral's right LED based on the operands (RGB order)
+4A           | 2    | TRP      | If supported, set the peripheral's Trap Slot LED based on the operand
 50           | 1    | INR      | Increment the value in the R register by 1
 51           | 1    | ING      | Increment the value in the G register by 1
 52           | 1    | INB      | Increment the value in the B register by 1
@@ -60,12 +58,14 @@ FA           | 1    | NOP      | No operation
 > For instance, `LDG "A"` would load the value stored in the `A` register into the G register.
 
 Not prepending `#` to the value, or not using a register, loads the value from the address.
-> For instancee.g. `LDB $80` would load the value at address `0xC0` into the B register.
+> For instance, `LDB $80` would load the value at address `0x80` into the B register.
 
 > [!Note]
-> prepending the integer value with a `$` indicates hex, and `%` indicates binary. Otherwise, the value is treated as base-10.
+> Prepending the integer value with a `$` indicates hex, and `%` indicates binary. Otherwise, the value is treated as base-10.
 
 ## Elemental Color Index
+The SPIC's firmware itself contains RGB entries for each element, so that the peripheral's LED can be changed to a predefined color based on element. This primarily exists for keeping elemental color consistency if the SPIC's firmware is being simulated and/or embedded inside of another project that houses its own elemental colors.
+
 Each element has a given numerical value.
 ID | Element
 ---|--------
@@ -82,11 +82,14 @@ ID | Element
 0A | Dark
 0B | Kaos
 
-For example, using the instruction `ELM #$04` would give the same outcome as `ELFI` (set LED to the Fire element color).
+As an example, using the instruction `ELM #$04` would give the same outcome as `ELFI` (set LED to the Fire element color).
 
-Using `ELM #$00` will set the LED to RGB `#000000`, unless a proper entry is added to the firmware for element `0`. Values above `0B` are undefined behavior and do nothing.
+Using `ELM #$00` will set the LED to RGB `#000000`, unless a proper entry is added to the firmware for element `0`. Values above `0B` is normally undefined behavior and will do nothing.
 
 Additional elements can be taken advantage of with this system, given:
-- A new color entry is made for said additional element (e.g. `OC` for a new element)
-- Correctly called by the NES ROM
-    - For example, `ELM #$0C` to set the peripheral's LED to the aforementioned new color entry
+- A new color entry is made for said additional element (e.g. `OC`)
+- The new entry is correctly called by the NES ROM
+    - e.g., `ELM #$0C` to set the peripheral's LED to the aforementioned new color entry
+
+> [!NOTE]
+> The SPIC interprets the byte-level instruction for the elements by the high and low nibbles independently. This means that the byte-level instructions `3C`-`3F` would correlate to the same outcome as `ELM #$0C`-`ELM #$0F`. These are illegal instructions, but can be taken advantage of regardless.

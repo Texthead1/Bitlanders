@@ -10,6 +10,7 @@ import sys
 # TODO: detect duplicate function names
 # TODO: better error handling
 # TODO: add NES register support for operands + inline 6502 asm (PHA and PLA are musts)
+# TODO: split into multiple .py files
 
 # loops are now unrolled, reduces cycles for transfer
 
@@ -73,7 +74,7 @@ def compile_function(lines):
     return mcode
 
 # returns a string[] representing a 6502 asm function
-# which wraps the skyasm machine code as .byte directives
+# which wraps the SkyASM instructions and streams them to the command port
 def emit_proc(name, mcode):
     out = []
     out.append(f".export _{name}\n")		
@@ -100,8 +101,8 @@ def emit_header(name, functions):
     
     return "\n".join(out)
 
-# we wanna convert the skyasm file to 6502 asm
-# out a .s file which wraps the skyasm to 6502 asm
+# we wanna convert the SkyASM file down to the byte-level instructions
+# and then wrap in 6502 asm to stream to the command port
 # then ca65 will assemble the out .s
 def wrap_skyasm():
     global base_name
