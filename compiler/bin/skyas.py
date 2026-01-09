@@ -9,6 +9,9 @@ import sys
 # TODO: make this more robust with a proper parser
 # TODO: detect duplicate function names
 # TODO: better error handling
+# TODO: add NES register support for operands + inline 6502 asm (PHA and PLA are musts)
+
+# loops are now unrolled, reduces cycles for transfer
 
 SKYASM_EXT  = ".ssa"
 CA65ASM_EXT = ".s"
@@ -18,7 +21,7 @@ VERBOSE = False
 
 base_name = ""
 
-# TODO: expand opcodes
+# TODO: expand opcodes, add new ones!
 OPCODES = {
     "rst" : [0x00],
     "aon" : [0x01],
@@ -77,18 +80,12 @@ def emit_proc(name, mcode):
     out.append(f".segment \"CODE\"\n")
     out.append(f"; callable in C as: void {name}(void);")
     out.append(f"_{name}:")
-    out.append(f"\tldx #$00")
-    out.append(f"@loop:")
-    out.append(f"\tlda {name}_data, x")
-    out.append(f"\tsta ${SKYRETRO_CMD_PORT:04X}")
-    out.append(f"\tinx")
-    out.append(f"\tcpx #{len(mcode)}")
-    out.append(f"\tbne @loop")
-    out.append(f"\trts\n")
-    out.append(f"{name}_data:")
 
     for byte in mcode:
-        out.append(f"\t.byte ${byte:02X}")
+        out.append(f"\tlda #${byte:02X}")
+        out.append(f"\tsta ${SKYRETRO_CMD_PORT:04X}")
+
+    out.append(f"\trts\n")
 
     return "\n".join(out)
 
@@ -173,21 +170,21 @@ def assemble():
     for root, _, files in os.walk('.'):
         for filename in files:
             if filename.endswith(SKYASM_EXT):
-                print("Assembling file: " + filename)
+                if VERBOSE: print("Assembling file: " + filename)
                 handle_file(os.path.join(root, filename))
-                print(f"Assembled: {filename}")
+                if VERBOSE: print(f"Assembled: {filename}")
                 out_files.append(os.path.join(root.removeprefix(".\\"), os.path.splitext(filename)[0] + CA65ASM_EXT))
                 obj_list.append(os.path.join(root.removeprefix(".\\"), os.path.splitext(filename)[0] + ".o"))
 
-    print(f"Assembled {len(out_files)} files.")
+    print(f"Assembled {len(out_files)} SkyASM {SKYASM_EXT} files")
     if len(out_files) == 0: return
     
-    with open("skyc_assembled.txt", "w") as f:
-        print("\n".join(out_files))
+    with open("skyas_assembled.txt", "w") as f:
+        if VERBOSE: print("\n".join(out_files))
         f.write("\n".join(out_files))
     
-    with open("skyc_objlist.txt", "w") as f:
-        print("\n".join(obj_list))
+    with open("skyas_objlist.txt", "w") as f:
+        if VERBOSE: print("\n".join(obj_list))
         f.write("\n".join(obj_list))
 
 # we wanna grab the original .ssa file and remove the corresponding .s file
@@ -201,19 +198,19 @@ def clean():
         for filename in files:
             if filename.endswith(SKYASM_EXT):
                 clean_skyasm(os.path.join(root, filename))
-            elif filename == "skyc_assembled.txt":
+            elif filename == "skyas_assembled.txt":
                 if VERBOSE: print(f"Removing file: {filename}")
                 os.remove(filename)
-            elif filename == "skyc_objlist.txt":
+            elif filename == "skyas_objlist.txt":
                 if VERBOSE: print(f"Removing file: {filename}")
                 os.remove(filename)
 
 def help():
-    print("Usage: python skyc.py [--asmc | --clean] [--verbose]")
-    print("  --asmc, -a     : Assemble all skyasm files in directory.")
-    print("  --clean, -c    : Clean all wrapped files in directory.")
-    print("  --verbose, -v  : Enable verbose output.")
-    print("  --help, -h     : Show this help message.")
+    print("Usage: python skyas.py [--asmc | --clean] [--verbose]")
+    print("  --asmc, -a     : Assemble all SkyASM .ssa files in directory")
+    print("  --clean, -c    : Clean all wrapped files in directory")
+    print("  --verbose, -v  : Enable verbose output")
+    print("  --help, -h     : Show this help message")
     sys.exit(0)
 
 if __name__ == "__main__":
