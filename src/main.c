@@ -1,4 +1,5 @@
 #include "main.h"
+#include "hats.c"
 
 #define XPOS 6
 #define YPOS 8
@@ -413,21 +414,31 @@ void load_room(void) {
 }
 
 void player_movement(void) {
+    if (PLAYER_IS_DEBUG) {
+        if (pad1_poll & PAD_SELECT) {
+            if (pad1_new & PAD_B) {
+                PLAYER_SET_DEBUG(FALSE);
+            }
+        } else {
+            if (pad1_new & PAD_A) {
+                if (++hat_pointer >= HAT_COUNT) hat_pointer = 0;
+            }
+        }
+
+        debug_movement();
+        player_collision_x = high_byte(player.x);
+        player_collision_y = high_byte(player.y);
+        return;
+    }
+
     if (pad1_poll & PAD_SELECT && !lock_controls) {
         if (pad1_new & PAD_B) {
-            PLAYER_SET_DEBUG(!PLAYER_IS_DEBUG);
+            PLAYER_SET_DEBUG(TRUE);
         }
 
         if (pad1_new & PAD_A) {
             profile = !profile;
         }
-    }
-
-    if (PLAYER_IS_DEBUG) {
-        debug_movement();
-        player_collision_x = high_byte(player.x);
-        player_collision_y = high_byte(player.y);
-        return;
     }
 
     // grounded control code
@@ -976,8 +987,19 @@ void set_player_anim(unsigned char* anim) {
 #define RUN_THRESHOLD 0x300
 #define JOG_THRESHOLD 0x100
 
+void set_hat_palette(const char i) {
+    pal_col(0x15, hat_palettes[i][1]);
+    pal_col(0x16, hat_palettes[i][2]);
+    pal_col(0x17, hat_palettes[i][3]);
+}unsigned char hat_anim_id = 0;
+
+void get_accessory_hat(const char i) {
+    current_hat_frame = hats[hat_pointer][PLAYER_FACING_RIGHT ? 0 : 1][i];
+}
+
 void draw_player(void) {
     ++player.anim_timer;
+    set_hat_palette(hat_pointer);
 
     if (current_anim != bean_walk_anim[0] || current_anim != bean_walk_anim[1] || current_anim != bean_walk_anim[2] || current_anim != bean_walk_anim_flipped[0] || current_anim != bean_walk_anim_flipped[1] || current_anim != bean_walk_anim_flipped[2]) {
         if (player.vel_x <= RUN_THRESHOLD && player.vel_x >= -RUN_THRESHOLD)
@@ -985,20 +1007,24 @@ void draw_player(void) {
     }
 
     if (!PLAYER_IS_GROUNDED) {
-        if (player.vel_y < 0)
+        if (player.vel_y < 0) {
             set_player_anim(PLAYER_FACING_RIGHT ? bean_jump : bean_jump_flipped);
-        else
+            get_accessory_hat(1);
+        } else {
             set_player_anim(PLAYER_FACING_RIGHT ? bean_fall : bean_fall_flipped);
-        
+            get_accessory_hat(2);
+        }
         goto draw;
     }
 
     if (player.vel_x == 0) {
-        if (current_anim != bean_idle && current_anim != bean_idle_flipped)
+        if (current_anim != bean_idle && current_anim != bean_idle_flipped) {
             if (player.anim_timer > 0x8A && (current_anim == bean_stand || current_anim == bean_stand_flipped))
                 set_player_anim(PLAYER_FACING_RIGHT ? bean_idle : bean_idle_flipped);
             else
                 set_player_anim(PLAYER_FACING_RIGHT ? bean_stand : bean_stand_flipped);
+            get_accessory_hat(0);
+        }
         goto draw;
     }
 
@@ -1021,6 +1047,9 @@ void draw_player(void) {
     set_player_anim(PLAYER_FACING_RIGHT ? bean_walk_anim[temp_u8_1 & 3] : bean_walk_anim_flipped[temp_u8_1 & 3]);
     player.anim_timer = temp_u8_0;
 
+    get_accessory_hat(0);
+
     draw:
+    oam_meta_spr(high_byte(player.x), high_byte(player.y) - 4, current_hat_frame);
     oam_meta_spr(high_byte(player.x), high_byte(player.y), current_anim);
 }

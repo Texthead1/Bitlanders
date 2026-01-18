@@ -1,10 +1,10 @@
 #include "../lib/libnes/neslib.h"
 #include "../lib/nesdoug/nesdoug.h"
 #include "../lib/libskyretro/skyretro.h"
-#include "metasprites.h"
+#include "characters/bean.h"
 #include "metatiles.h"
-#include "echo.h"
 #include "title.h"
+#include "echo.h"
 
 #pragma bss-name(push, "ZEROPAGE")
 
@@ -69,6 +69,8 @@ typedef struct {
 } Player;
 const unsigned char* current_anim;
 unsigned char current_anim_frame;
+
+const unsigned char* current_hat_frame;
 
 Player player = { 0x1000, 0x0000 };
 

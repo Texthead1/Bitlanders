@@ -1,0 +1,50 @@
+#include "hats/11_tophat.h"
+
+static const unsigned char top_hat_stand[] = {
+    0x00, 0x00, 0x0D, 0x00 | 1,
+    0x08, 0x00, 0x0E, 0x00 | 1,
+    0x80
+};
+
+static const unsigned char top_hat_tiltleft[] = {
+    0x00, 0x01, 0x0D, 0x00 | 1,
+    0x08, 0x00, 0x0E, 0x00 | 1,
+    0x80
+};
+
+static const unsigned char top_hat_tiltright[] = {
+    0x00, 0x00, 0x0D, 0x00 | 1,
+    0x08, 0x01, 0x0E, 0x00 | 1,
+    0x80
+};
+
+static const unsigned char top_hat_stand_flipped[] = {
+    0x00, 0x00, 0x0E, 0x00 | OAM_FLIP_H | 1,
+    0x08, 0x00, 0x0D, 0x00 | OAM_FLIP_H | 1,
+    0x80
+};
+
+static const unsigned char top_hat_tiltleft_flipped[] = {
+    0x00, 0x00, 0x0E, 0x00 | OAM_FLIP_H | 1,
+    0x08, 0x01, 0x0D, 0x00 | OAM_FLIP_H | 1,
+    0x80
+};
+
+static const unsigned char top_hat_tiltright_flipped[] = {
+    0x00, 0x01, 0x0E, 0x00 | OAM_FLIP_H | 1,
+    0x08, 0x00, 0x0D, 0x00 | OAM_FLIP_H | 1,
+    0x80
+};
+
+const unsigned char* const top_hat[2][3] = {
+    { top_hat_stand, top_hat_tiltleft, top_hat_tiltright },
+    { top_hat_stand_flipped, top_hat_tiltleft_flipped, top_hat_tiltright_flipped }
+};
+
+const unsigned char top_hat_palette[] = {
+    0x0F, 0x06, 0x26, 0x38
+};
+
+const unsigned char top_hat_palette[] = {
+    0x0F, 0x01, 0x12, 0x23
+};

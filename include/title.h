@@ -1,5 +1,5 @@
-#include "title1.h"
-#include "title2.h"
+#include "title/title1.h"
+#include "title/title2.h"
 
 const unsigned char title_palette_0[] = {
     0x31, 0x21, 0x0C, 0x30,
