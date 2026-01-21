@@ -5,6 +5,7 @@
 #include "metatiles.h"
 #include "title.h"
 #include "echo.h"
+#include "hats.h"
 
 #pragma bss-name(push, "ZEROPAGE")
 
@@ -70,7 +71,7 @@ typedef struct {
 const unsigned char* current_anim;
 unsigned char current_anim_frame;
 
-const unsigned char* current_hat_frame;
+unsigned char current_hat_frame;
 
 Player player = { 0x1000, 0x0000 };
 

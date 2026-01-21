@@ -1,4 +1,5 @@
 #include "characters/bean.h"
+#include "../lib/libnes/neslib.h"
 
 const unsigned char bean_stand[] = {
     0x00, 0x00, 0x01, 0x00,

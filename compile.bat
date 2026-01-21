@@ -4,15 +4,34 @@ set path=%path%;..\..\cc65\bin\
 set CC65_HOME=..\..\cc65\
 
 cc65 -Oirs src\main.c -Iinclude --add-source
+cc65 -Oirs src\characters\bean.c -Iinclude --add-source
+cc65 -Oirs src\hats\11_tophat.c -Iinclude --add-source
+cc65 -Oirs src\hats\17_bone.c -Iinclude --add-source
+cc65 -Oirs src\hats\22_cowboy.c -Iinclude --add-source
+
 ca65 linker\crt0.s
 
 if not exist src\main.s pause
 
 ca65 src\main.s -g
-ld65 -C linker\rom.cfg -o %out%.nes linker\crt0.o src\main.o nes.lib -Ln build\\%out%.lbl
+ca65 src\characters\bean.s -g
+ca65 src\hats\11_tophat.s -g
+ca65 src\hats\17_bone.s -g
+ca65 src\hats\22_cowboy.s -g
+
+ld65 -C linker\rom.cfg -o %out%.nes linker\crt0.o src\main.o src\characters\bean.o src\hats\11_tophat.o src\hats\17_bone.o src\hats\22_cowboy.o nes.lib -Ln build\\%out%.lbl
 
 del src\main.o
+del src\characters\bean.o
+del src\hats\11_tophat.o
+del src\hats\17_bone.o
+del src\hats\22_cowboy.o
 del linker\crt0.o
+
+del src\characters\bean.s
+del src\hats\11_tophat.s
+del src\hats\17_bone.s
+del src\hats\22_cowboy.s
 
 move /Y src\main.s build\ 
 move /Y %out%.nes build\
