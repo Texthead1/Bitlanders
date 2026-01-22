@@ -4,10 +4,11 @@
 #include "../engine/mapper/mmc3/mmc3_code.h"
 #include "../engine/mapper/mmc3/mmc3_code.c"
 #include "portal/portal_init.h"
-#include "metasprites.h"
+#include "characters/bean.h"
 #include "metatiles.h"
-#include "echo.h"
 #include "title.h"
+#include "echo.h"
+#include "hats.h"
 
 #pragma bss-name(push, "ZEROPAGE")
 
@@ -20,6 +21,8 @@ unsigned char temp_u8_2;
 unsigned char temp_u8_3;
 unsigned int temp_u16_0;
 unsigned int temp_u16_1;
+
+unsigned char has_hat;
 
 // GAME VARIABLES
 typedef enum {
@@ -72,6 +75,8 @@ typedef struct {
 } Player;
 const unsigned char* current_anim;
 unsigned char current_anim_frame;
+
+unsigned char current_hat_frame;
 
 Player player = { 0x1000, 0x0000 };
 
@@ -274,7 +279,7 @@ unsigned char lock_controls;
 unsigned char game_begun;
 
 #pragma bss-name(push, "BSS")
-//unsigned char solo_advent;
+unsigned char use_player_palette_for_hat;
 unsigned char collision_map[240];
 unsigned char collision_map2[240];
 
@@ -302,13 +307,6 @@ typedef struct {
 const unsigned char palette[] = {
     0x0F, 0x00, 0x10, 0x30,
     0x0F, 0x14, 0x21, 0x2B,
-    0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00
-};
-
-const unsigned char bean_palette[] = {
-    0x0F, 0x01, 0x1C, 0x2A,
-    0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00
 };
@@ -406,4 +404,6 @@ void calculate_eject_distance_left(signed char*);
 void calculate_eject_distance_right(signed char*);
 void calculate_eject_distance_up(signed char*);
 void calculate_eject_distance_down(signed char*);
+void set_hat_palette(const char);
+void set_hat_palette_to_player(void);
 void draw_player(void);

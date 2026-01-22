@@ -32,6 +32,7 @@ void main(void) {
     game_state = STATE_TITLE;
     unground_speed = 0;
     profile = 0;
+    has_hat = 0;
 
     music_play(0);
     ppu_on_all();
@@ -331,6 +332,11 @@ void change_scene(void) {
         ppu_on_all();
         write_emu_text();
         POKE(0x8000, 1);
+        if (!use_player_palette_for_hat) {
+            set_hat_palette(current_hat);
+        } else {
+            set_hat_palette_to_player();
+        }
     } else if (game_state == STATE_1) {
         pal_bg(echo_palette);
         pal_spr(echo_palette);
@@ -348,6 +354,11 @@ void change_scene(void) {
         set_scroll_x(cam_x);
         load_room();
         POKE(0x8000, 1);
+        if (!use_player_palette_for_hat) {
+            set_hat_palette(current_hat);
+        } else {
+            set_hat_palette_to_player();
+        }
     }
 }
 
@@ -432,6 +443,31 @@ void player_movement(void) {
         player_collision_x = high_byte(player.x);
         player_collision_y = high_byte(player.y);
         return;
+    }
+
+    if (pad1_new & PAD_B && !(pad1_poll & PAD_SELECT)) {
+        if (!has_hat) {
+            has_hat = 1;
+        } else if (++current_hat >= HAT_COUNT) {
+            has_hat = 0;
+            current_hat = 0;
+        }
+
+        if (!use_player_palette_for_hat) {
+            set_hat_palette(current_hat);
+        } else {
+            set_hat_palette_to_player();
+        }
+    }
+
+    if (pad1_new & PAD_UP) {
+        if (use_player_palette_for_hat) {
+            use_player_palette_for_hat = 0;
+            set_hat_palette(current_hat);
+        } else {
+            use_player_palette_for_hat = 1;
+            set_hat_palette_to_player();
+        }
     }
 
     // grounded control code
@@ -704,14 +740,18 @@ char collision_down(void) {
         unground_speed = player.y - player_old_y;
         prev_tile_below = (temp_u8_2 != TILE_CTYPE_FLAT) ? temp_u8_2 : prev_tile_below;
         return 1;
-    } else if (PLAYER_IS_GROUNDED && eject_distance <= 4) {
+    }
+
+    if (PLAYER_IS_GROUNDED && eject_distance <= 4) {
         high_byte(player.y) += eject_distance;
         player.y &= 0xFF00;
         player.vel_y = 0;
         unground_speed = player.y - player_old_y;
         prev_tile_below = (temp_u8_2 != TILE_CTYPE_FLAT) ? temp_u8_2 : prev_tile_below;
         return 1;
-    } else if (PLAYER_IS_GROUNDED) {
+    }
+
+    if (PLAYER_IS_GROUNDED) {
         PLAYER_SET_GROUNDED(FALSE);
 
         // soften player y vel if running off of a convex edge
@@ -980,8 +1020,29 @@ void set_player_anim(unsigned char* anim) {
 #define RUN_THRESHOLD 0x300
 #define JOG_THRESHOLD 0x100
 
+void set_hat_palette(const char i) {
+    pal_col(0x15, hat_palettes[i][1]);
+    pal_col(0x16, hat_palettes[i][2]);
+    pal_col(0x17, hat_palettes[i][3]);
+}
+
+void set_hat_palette_to_player(void) {
+    pal_col(0x15, bean_palette[1]);
+    pal_col(0x16, bean_palette[2]);
+    pal_col(0x17, bean_palette[3]);
+}
+
+void set_accessory_frame(const char i) {
+    current_hat_frame = i;
+}
+
+int accessory_offset_x = 0;
+int accessory_offset_y = 0;
+
 void draw_player(void) {
     ++player.anim_timer;
+    accessory_offset_x = 0;
+    accessory_offset_y = 3;
 
     if (current_anim != bean_walk_anim[0] || current_anim != bean_walk_anim[1] || current_anim != bean_walk_anim[2] || current_anim != bean_walk_anim_flipped[0] || current_anim != bean_walk_anim_flipped[1] || current_anim != bean_walk_anim_flipped[2]) {
         if (player.vel_x <= RUN_THRESHOLD && player.vel_x >= -RUN_THRESHOLD)
@@ -989,20 +1050,30 @@ void draw_player(void) {
     }
 
     if (!PLAYER_IS_GROUNDED) {
-        if (player.vel_y < 0)
+        if (player.vel_y < 0) {
             set_player_anim(PLAYER_FACING_RIGHT ? bean_jump : bean_jump_flipped);
-        else
+            set_accessory_frame(1);
+            accessory_offset_x = -1;
+            accessory_offset_y = 5;
+        } else {
             set_player_anim(PLAYER_FACING_RIGHT ? bean_fall : bean_fall_flipped);
-        
+            set_accessory_frame(0);
+            accessory_offset_y = 5;
+        }
         goto draw;
     }
 
     if (player.vel_x == 0) {
-        if (current_anim != bean_idle && current_anim != bean_idle_flipped)
-            if (player.anim_timer > 0x8A && (current_anim == bean_stand || current_anim == bean_stand_flipped))
+        if (current_anim != bean_idle && current_anim != bean_idle_flipped) {
+            if (player.anim_timer > 0x8A && (current_anim == bean_stand || current_anim == bean_stand_flipped)) {
                 set_player_anim(PLAYER_FACING_RIGHT ? bean_idle : bean_idle_flipped);
-            else
+                accessory_offset_y = 4; 
+            } else {
                 set_player_anim(PLAYER_FACING_RIGHT ? bean_stand : bean_stand_flipped);
+                accessory_offset_y = 3;
+            }
+            set_accessory_frame(0);
+        } else { accessory_offset_y = 4; }
         goto draw;
     }
 
@@ -1025,6 +1096,24 @@ void draw_player(void) {
     set_player_anim(PLAYER_FACING_RIGHT ? bean_walk_anim[temp_u8_1 & 3] : bean_walk_anim_flipped[temp_u8_1 & 3]);
     player.anim_timer = temp_u8_0;
 
+    switch ((temp_u8_1 & 3)) {
+        case 0:
+            set_accessory_frame(1);
+            accessory_offset_x = -1;
+            break;
+        case 1:
+            set_accessory_frame(0);
+            break;
+        case 2:
+            set_accessory_frame(2);
+            accessory_offset_x = 2;
+            break;
+        case 3:
+            set_accessory_frame(0);
+            break;
+    }
+
     draw:
+    if (has_hat) oam_meta_spr(high_byte(player.x) + (PLAYER_FACING_RIGHT ? accessory_offset_x : -accessory_offset_x), high_byte(player.y) - accessory_offset_y, hats[current_hat][PLAYER_FACING_RIGHT ? 0 : 1][current_hat_frame]);
     oam_meta_spr(high_byte(player.x), high_byte(player.y), current_anim);
 }

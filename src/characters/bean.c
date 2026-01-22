@@ -1,3 +1,6 @@
+#include "characters/bean.h"
+#include "../lib/libnes/neslib.h"
+
 const unsigned char bean_stand[] = {
     0x00, 0x00, 0x01, 0x00,
     0x08, 0x00, 0x02, 0x00,
@@ -112,3 +115,10 @@ const unsigned char bean_walk1_split_flipped[] = {
 
 const unsigned char* bean_walk_anim[] = { bean_walk1, bean_walk1_split, bean_walk2, bean_walk1_split };
 const unsigned char* bean_walk_anim_flipped[] = { bean_walk1_flipped, bean_walk1_split_flipped, bean_walk2_flipped, bean_walk1_split_flipped };
+
+const unsigned char bean_palette[] = {
+    0x0F, 0x01, 0x1C, 0x2A,
+    0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00
+};
