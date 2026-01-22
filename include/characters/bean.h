@@ -16,3 +16,5 @@ extern const unsigned char bean_walk1_split_flipped[];
 
 extern const unsigned char* bean_walk_anim[];
 extern const unsigned char* bean_walk_anim_flipped[];
+
+extern const unsigned char bean_palette[];

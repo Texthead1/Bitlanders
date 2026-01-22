@@ -42,10 +42,10 @@ const unsigned char* const cowboy_hat[2][3] = {
     { cowboy_hat_stand_flipped, cowboy_hat_tiltleft_flipped, cowboy_hat_tiltright_flipped }
 };
 
-/*const unsigned char cowboy_hat_palette[] = {
-    0x0F, 0x06, 0x26, 0x38
-};*/
-
 const unsigned char cowboy_hat_palette[] = {
-    0x0F, 0x07, 0x16, 0x27
+    0x0F, 0x06, 0x26, 0x38
 };
+
+/*const unsigned char cowboy_hat_palette[] = {
+    0x0F, 0x07, 0x16, 0x27
+};*/

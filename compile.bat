@@ -36,5 +36,4 @@ del src\hats\22_cowboy.s
 move /Y src\main.s build\ 
 move /Y %out%.nes build\
 
-pause
 build\\%out%.nes

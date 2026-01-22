@@ -6,6 +6,6 @@
 
 #define HAT_COUNT 3
 
-unsigned char hat_pointer = 0;
-const unsigned char* const* const hats[] = { cowboy_hat, cowboy_hat, cowboy_hat };
+unsigned char current_hat = 0;
+const unsigned char* const (* const hats[])[3] = { cowboy_hat, bone_head, top_hat };
 const unsigned char* const hat_palettes[] = { cowboy_hat_palette, bone_head_palette, top_hat_palette };

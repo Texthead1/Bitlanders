@@ -28,6 +28,7 @@ void main(void) {
     game_state = STATE_TITLE;
     unground_speed = 0;
     profile = 0;
+    has_hat = 0;
 
     music_play(0);
     ppu_on_all();
@@ -327,6 +328,11 @@ void change_scene(void) {
         ppu_on_all();
         write_emu_text();
         POKE(0x8000, 1);
+        if (!use_player_palette_for_hat) {
+            set_hat_palette(current_hat);
+        } else {
+            set_hat_palette_to_player();
+        }
     } else if (game_state == STATE_1) {
         pal_bg(echo_palette);
         pal_spr(echo_palette);
@@ -344,6 +350,11 @@ void change_scene(void) {
         set_scroll_x(cam_x);
         load_room();
         POKE(0x8000, 1);
+        if (!use_player_palette_for_hat) {
+            set_hat_palette(current_hat);
+        } else {
+            set_hat_palette_to_player();
+        }
     }
 }
 
@@ -428,6 +439,31 @@ void player_movement(void) {
         player_collision_x = high_byte(player.x);
         player_collision_y = high_byte(player.y);
         return;
+    }
+
+    if (pad1_new & PAD_B) {
+        if (!has_hat) {
+            has_hat = 1;
+        } else if (++current_hat >= HAT_COUNT) {
+            has_hat = 0;
+            current_hat = 0;
+        }
+
+        if (!use_player_palette_for_hat) {
+            set_hat_palette(current_hat);
+        } else {
+            set_hat_palette_to_player();
+        }
+    }
+
+    if (pad1_new & PAD_UP) {
+        if (use_player_palette_for_hat) {
+            use_player_palette_for_hat = 0;
+            set_hat_palette(current_hat);
+        } else {
+            use_player_palette_for_hat = 1;
+            set_hat_palette_to_player();
+        }
     }
 
     // grounded control code
@@ -982,6 +1018,12 @@ void set_hat_palette(const char i) {
     pal_col(0x17, hat_palettes[i][3]);
 }
 
+void set_hat_palette_to_player(void) {
+    pal_col(0x15, bean_palette[1]);
+    pal_col(0x16, bean_palette[2]);
+    pal_col(0x17, bean_palette[3]);
+}
+
 void set_accessory_frame(const char i) {
     current_hat_frame = i;
 }
@@ -991,7 +1033,6 @@ int accessory_offset_y = 0;
 
 void draw_player(void) {
     ++player.anim_timer;
-    set_hat_palette(hat_pointer);
     accessory_offset_x = 0;
     accessory_offset_y = 3;
 
@@ -1065,6 +1106,6 @@ void draw_player(void) {
     }
 
     draw:
-    oam_meta_spr(high_byte(player.x) + (PLAYER_FACING_RIGHT ? accessory_offset_x : -accessory_offset_x), high_byte(player.y) - accessory_offset_y, cowboy_hat[PLAYER_FACING_RIGHT ? 0 : 1][current_hat_frame]);
+    if (has_hat) oam_meta_spr(high_byte(player.x) + (PLAYER_FACING_RIGHT ? accessory_offset_x : -accessory_offset_x), high_byte(player.y) - accessory_offset_y, hats[current_hat][PLAYER_FACING_RIGHT ? 0 : 1][current_hat_frame]);
     oam_meta_spr(high_byte(player.x), high_byte(player.y), current_anim);
 }
