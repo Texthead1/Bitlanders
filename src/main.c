@@ -3,6 +3,9 @@
 #define XPOS 6
 #define YPOS 8
 
+#pragma rodata-name ("CODE")
+#pragma code-name ("CODE")	
+
 void main(void) {
     ppu_off();
     pal_spr(title_palette_sprites);
@@ -24,6 +27,7 @@ void main(void) {
     oam_spr(245, 162, 0xFE, 0x01);
     temp_u16_0 = INIT_SCREEN_SCROLL_Y;
     skyretro_set_test_shared_s16();
+    portal_init();
 
     game_state = STATE_TITLE;
     unground_speed = 0;

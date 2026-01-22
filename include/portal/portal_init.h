@@ -1,0 +1,1 @@
+void portal_init(void);

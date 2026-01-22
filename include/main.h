@@ -1,6 +1,9 @@
 #include "../lib/libnes/neslib.h"
 #include "../lib/nesdoug/nesdoug.h"
 #include "../lib/libskyretro/skyretro.h"
+#include "../engine/mapper/mmc3/mmc3_code.h"
+#include "../engine/mapper/mmc3/mmc3_code.c"
+#include "portal/portal_init.h"
 #include "characters/bean.h"
 #include "metatiles.h"
 #include "title.h"
@@ -284,6 +287,12 @@ extern const unsigned char demo_input[];
 unsigned char demo_counter;
 
 unsigned char profile;
+
+#pragma bss-name(push, "XRAM")
+// extra RAM at $6000-$7fff
+unsigned char wram_array[0x2000];
+
+#pragma bss-name(pop)
 
 // ENTITY VARIABLES
 typedef struct {
