@@ -441,7 +441,7 @@ void player_movement(void) {
         return;
     }
 
-    if (pad1_new & PAD_B) {
+    if (pad1_new & PAD_B && !(pad1_poll & PAD_SELECT)) {
         if (!has_hat) {
             has_hat = 1;
         } else if (++current_hat >= HAT_COUNT) {
@@ -736,14 +736,18 @@ char collision_down(void) {
         unground_speed = player.y - player_old_y;
         prev_tile_below = (temp_u8_2 != TILE_CTYPE_FLAT) ? temp_u8_2 : prev_tile_below;
         return 1;
-    } else if (PLAYER_IS_GROUNDED && eject_distance <= 4) {
+    }
+
+    if (PLAYER_IS_GROUNDED && eject_distance <= 4) {
         high_byte(player.y) += eject_distance;
         player.y &= 0xFF00;
         player.vel_y = 0;
         unground_speed = player.y - player_old_y;
         prev_tile_below = (temp_u8_2 != TILE_CTYPE_FLAT) ? temp_u8_2 : prev_tile_below;
         return 1;
-    } else if (PLAYER_IS_GROUNDED) {
+    }
+
+    if (PLAYER_IS_GROUNDED) {
         PLAYER_SET_GROUNDED(FALSE);
 
         // soften player y vel if running off of a convex edge
