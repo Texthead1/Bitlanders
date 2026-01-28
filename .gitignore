@@ -1,3 +1,4 @@
 /build/
 /dev/
 /.vscode/
+**/__pycache__/

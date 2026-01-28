@@ -1,0 +1,11 @@
+.fn test
+    elmg
+    eler
+    ldr #$FF
+    ldg #$FF
+    ldb #$FF
+    ldr 'A'
+    ldg "X"
+    ldb 'Y'
+    rgb
+.endfn

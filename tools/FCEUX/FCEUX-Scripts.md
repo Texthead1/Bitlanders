@@ -21,12 +21,9 @@ For example, the output console from the embedded image above would look like:
 
 PC   | Address | Opcode (Hex) | Operand(s) | Opcode Mnemonic
 -----|---------|--------------|------------|----------------
-C324 | 4028    | 00           |            | RST
-C329 | 4028    | 01           |            | AON
-C333 | 4028    | 30           | FF         | LDR
-C33D | 4028    | 31           | 00         | LDG
-C347 | 4028    | 32           | 00         | LDB
-C34C | 4028    | 33           |            | RGB
-
-> [!WARNING]
-> These Mnemonic and Opcode pairings are outdated in relation to the [SkyASM Opcodes](../../docs/SkyASM-Opcodes.md). However, this updated list has not yet been taken into account with this script or skyas.
+C564 | 4028    | 00           |            | RST
+C569 | 4028    | 10           |            | AON
+C573 | 4028    | 21           | FF         | LDR
+C57D | 4028    | 22           | 00         | LDG
+C587 | 4028    | 23           | 00         | LDB
+C58C | 4028    | 20           |            | RGB

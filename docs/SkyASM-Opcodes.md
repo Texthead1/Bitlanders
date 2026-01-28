@@ -4,25 +4,25 @@ The SkyRetro Peripheral Interface Controller (SPIC) has 3 registers: `R`, `G`, a
 
 Opcode (Hex) | Size | Mnemonic | Information
 -------------|------|----------|------------
-00           | 1    | AON      | Enable the nfc field antenna of the connected peripheral
-10           | 1    | RST      | Reset the connected peripheral
+00           | 1    | RST      | Reset the connected peripheral
+10           | 1    | AON      | Enable the nfc field antenna of the connected peripheral
 20           | 1    | RGB      | Set the RGB of the peripheral's LED based on the R, G, and B registers
 21           | 2    | LDR      | Load a value into the R register
 22           | 2    | LDG      | Load a value into the G register
 23           | 2    | LDB      | Load a value into the B register
 28           | 4    | COL      | Set the RGB of the peripheral's LED based on the operands (RGB order)
 30           | 2    | ELM      | Set the peripheral's LED based on a given elemental index ([see more](#elemental-color-index))
-31           | 2    | ELER     | Set the peripheral's LED to the corresponding RGB for the Earth element
-32           | 2    | ELWA     | Set the peripheral's LED to the corresponding RGB for the Water element
-33           | 2    | ELAI     | Set the peripheral's LED to the corresponding RGB for the Air element
-34           | 2    | ELFI     | Set the peripheral's LED to the corresponding RGB for the Fire element
-35           | 2    | ELLF     | Set the peripheral's LED to the corresponding RGB for the Life element
-36           | 2    | ELDE     | Set the peripheral's LED to the corresponding RGB for the Undead element
-37           | 2    | ELMG     | Set the peripheral's LED to the corresponding RGB for the Magic element
-38           | 2    | ELTC     | Set the peripheral's LED to the corresponding RGB for the Tech element
-39           | 2    | ELLT     | Set the peripheral's LED to the corresponding RGB for the Light element
-3A           | 2    | ELDR     | Set the peripheral's LED to the corresponding RGB for the Dark element
-3B           | 2    | ELKS     | Set the peripheral's LED to the corresponding RGB for the Kaos element
+31           | 1    | ELER     | Set the peripheral's LED to the corresponding RGB for the Earth element
+32           | 1    | ELWA     | Set the peripheral's LED to the corresponding RGB for the Water element
+33           | 1    | ELAI     | Set the peripheral's LED to the corresponding RGB for the Air element
+34           | 1    | ELFI     | Set the peripheral's LED to the corresponding RGB for the Fire element
+35           | 1    | ELLF     | Set the peripheral's LED to the corresponding RGB for the Life element
+36           | 1    | ELDE     | Set the peripheral's LED to the corresponding RGB for the Undead element
+37           | 1    | ELMG     | Set the peripheral's LED to the corresponding RGB for the Magic element
+38           | 1    | ELTC     | Set the peripheral's LED to the corresponding RGB for the Tech element
+39           | 1    | ELLT     | Set the peripheral's LED to the corresponding RGB for the Light element
+3A           | 1    | ELDR     | Set the peripheral's LED to the corresponding RGB for the Dark element
+3B           | 1    | ELKS     | Set the peripheral's LED to the corresponding RGB for the Kaos element
 40           | 1    | RGBL     | If supported, set the peripheral's left LED based on the R, G, and B registers
 41           | 1    | RGBR     | If supported, set the peripheral's right LED based on the R, G, and B registers
 42           | 1    | RGBT     | If supported, set the peripheral's Trap Slot LED based on the R register
@@ -37,7 +37,7 @@ Opcode (Hex) | Size | Mnemonic | Information
 70           | 2    | WAIT     | Wait a given amount of ticks (tick is equal to a frame - 60hz), instructions avoid this wait time unless prepended by the BUF instruction
 74           | 1    | BUF      | Add the next instruction to the buffer. If there is no wait duration, the next instruction will execute immediately
 7A           | 1    | NOW      | Clear the wait time to execute the buffered instructions. Any buffered instructions will execute immediately
-80           | 1    | AOFF     | Disable the nfc field antenna of the connected peripheral
+90           | 1    | AOFF     | Disable the nfc field antenna of the connected peripheral
 A8           | 1    | BCOL     | If supported, set the peripheral's LED to revert to its basic hardware color cycle
 C0           | 2    | FLL      | If supported, set the peripheral's left LED based on the R, G, and B registers, with a fade duration (tick is equal to a frame - 60hz)
 C1           | 2    | FLR      | If supported, set the peripheral's right LED based on the R, G, and B registers, with a fade duration (tick is equal to a frame - 60hz)
@@ -76,8 +76,8 @@ The alternate category contains logically relevant alternatives, either inverted
 #### Categories (bits 6-4)
 ID  | Category
 ----|---------
-000 | Antenna/Peripheral Control
-001 | System/Reset
+000 | System/Reset
+001 | Antenna/Peripheral Control
 010 | LEDs
 011 | Elemental Color Operations
 100 | Extended LEDs
@@ -102,17 +102,33 @@ A8           | BCOL     | 010      | 1000
 Note that `28` and `A8` share the same action (`1000`), but differ in bit 7.
 
 ## Addressing Modes
-`#` loads an immediate value
-> For instance, `LDR #$40` would load `0x40` into the R register.
+### Immediate value 
+Prepending the operand with `#` indicates an immediate value
+- For instance, `LDR #$40` would load `0x40` into the R register.
 
-`"A"`/`"X"`/`"Y"` loads the value in the current register.
-> For instance, `LDG "A"` would load the value stored in the `A` register into the G register.
-
+### Value from address
 Not prepending `#` to the value, or not using a register, loads the value from the address.
-> For instance, `LDB $80` would load the value at address `0x80` into the B register.
+- For instance, `LDB $80` would load the value at address `0x80` into the B register.
+
+### NES Register Addressing
+Instead of an integer, the operand can be substituted for one of the three NES registers, `A`, `X`, and `Y`.
+
+`'A'`/`'X'`/`'Y'` or `"A"`/`"X"`/`"Y"` or loads the value in the respective register.
+- For instance, `LDG 'X'` would load the value stored in the `X` register into the G register.
+
+Note that there is clobbering of the `A` register used by the assembled SkyASM assembly. This means that simply using the A register won't actually use the value that was stored there before the current SkyASM subroutine started. This is intentional behavior, and will likely repeat the last opcode or operand sent to the SPIC. This clobbering behavior is not present for the other registers.
+
+To use a determined value stored in the `A` register before the subroutine started:
+- Use inline 6502 assembly blocks to execute a `pha` instruction before any SkyASM instructions in the subroutine
+- Use inline 6502 assembly to execute a `pla` instructoin (restoring the original value) right before the `A` register operand
+- If you want to use the value again, use another `pha` instruction directly after the current operand, and `pla` again right before it is next used.
+
+One limitation of this is that with opcodes with more than one operand, if the `A` register isn't used for the very last operand, the value cannot be pushed to the stack before the register is clobbered. In cases like this, it is suggested to use the `X` or `Y` registers, or alternatively pre-push the register value to the stack with `pha` if you do not reuse the register for other operands in the same instruction.
+
+I may add a buffering system for the exact scenario explained above; I still need to implement a lot of this after all :>
 
 > [!Note]
-> Prepending the integer value with a `$` indicates hex, and `%` indicates binary. Otherwise, the value is treated as base-10.
+> Prepending the integer value with a `$` indicates hex, and `%` indicates binary. Otherwise, the value is treated as base-10. Negative base-10 numbers are also supported,
 
 ## Elemental Color Index
 The SPIC's firmware itself contains RGB entries for each element, so that the peripheral's LED can be changed to a predefined color based on element. This primarily exists for keeping elemental color consistency if the SPIC's firmware is being simulated and/or embedded inside of another project that houses its own elemental colors.
