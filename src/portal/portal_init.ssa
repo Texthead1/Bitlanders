@@ -1,8 +1,7 @@
-.fn portal_init
+_portal_init:
     rst
     aon
     ldr #$FF
     ldg #$00
     ldb #$00
     rgb
-.endfn

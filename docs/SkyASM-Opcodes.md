@@ -88,7 +88,7 @@ ID  | Category
 #### Low Nibble
 The lower nibble selects the action within the category.
 
-Examples from category `010` (LED / RGB):
+Examples from category `010` (LEDs):
 
 Opcode (Hex) | Mnemonic | Category | Action
 -------------|----------|----------|-------

@@ -3,6 +3,7 @@
 # detect multiple opcodes
 # change label system
 
+import sys
 from dependencies.nes import NES_REGISTERS, generate_nes_register_identifier
 
 def strip_comments(line):
@@ -43,4 +44,5 @@ def parse_operand(operand):
     elif operand.startswith("-") and operand[1:].isdigit():
         return int(operand, 10)
     else:
-        raise ValueError(f"Invalid operand: {operand}")
+        print (f"Error: invalid operand: {operand}")
+        sys.exit(1)

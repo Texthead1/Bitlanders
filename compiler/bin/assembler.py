@@ -29,7 +29,7 @@ def handle_func(lines):
                     print(f"Error: {mnemonic} expects {operand_count} operand(s)")
                     sys.exit(1)
         else:
-            print(f"Unknown opcode: {mnemonic}")
+            print(f"Error: unknown instruction: \"{mnemonic}\"")
             sys.exit(1)
     return code
 
@@ -46,45 +46,36 @@ def assembler_act(file):
     function = []
     line_num = 1
     for line in lines:
-        line = line.strip()
-        if not line or line.startswith(";"):
+        tokens = tokenize(line)
+        if tokens_empty(tokens):
             line_num += 1
             continue
-        
-        head = line.split(";")[0].split()[0].strip()
-        name = line.split(";")[0].split()[1].strip() if len(line.split(";")[0].split()) > 1 else ""
-        if not name and head == ".fn":
-            print(f"Error: missing function name on line {line_num}")
-            sys.exit(1)
 
-        match head:
-            case ".fn":
-                current_function = name
-                function = []
-            case ".endfn":
-                if current_function:
-                    code = handle_func(function)
-                    functions.append((current_function, code))
-                    current_function = None
-                    function = []
-                else:
-                    print(f"Error: unexpected .endfn on line {line_num}")
-                    sys.exit(1)
-            case _:
-                if current_function:
-                    function.append(line)
-                else:
-                    print (f"Error: unexpected line outside function: \"{line}\" on line {line_num}")
-                    sys.exit(1)
+        token = tokens[0]
+        if token.endswith(":"):
+            if len(tokens) >= 2:
+                print(f"Error: unexpected \"{' '.join(tokens[1:])}\" on line {line_num}")
+                sys.exit(1)
+            if current_function:
+                code = handle_func(function)
+                functions.append((current_function, code))
+            current_function = token[:-1]
+            function = []
+        else:
+            if current_function:
+                function.append(line)
+            else:
+                print(f"Error: unexpected \"{line.strip()}\" on line {line_num}")
+                sys.exit(1)
         line_num += 1
-
+    
     if current_function:
-        print(f"Error: unresolved function \"{current_function}\"; missing .endfn")
-        sys.exit(1)
+        code = handle_func(function)
+        functions.append((current_function, code))
+        current_function = None
+        function = []
 
-    s_out = []
-    for func_name, code in functions:
-        s_out.append(emit_proc(func_name, code))
+    s_out = emit_proc(functions)
 
     with open(base_name + CA65ASM_EXT, "w") as f:
-        f.write("\n".join(s_out))
+        f.write(s_out)

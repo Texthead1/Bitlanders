@@ -4,16 +4,9 @@ import sys
 from assembler import assembler_act
 from out import CA65ASM_EXT, SKYASM_EXT
 
-# currently using a simplified function declaration labeling system
-# .fn function_name
-#   <skyasm code>
-# .endfn
-#
-# TODO: make this more robust with a proper parser
 # TODO: detect duplicate function names
 # TODO: better error handling
 # TODO: add inline 6502 asm (PHA and PLA are musts)
-# TODO: split into multiple .py files
 
 VERBOSE = False
 ASM_LOG_FILE = "skyas_assembled.txt"
