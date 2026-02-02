@@ -1,5 +1,8 @@
 import sys
-from dependencies.nes import get_asm_for_register_by_identifier, nes_register_identifier
+from dependencies.data_types import nativeASM, skyasmInstruction
+from dependencies.isa        import MNEMONIC_TO_OPCODE
+from dependencies.nes        import NES_REGISTERS, NESRegisterOperand
+from parser                  import count_nes_a_register_uses
 
 SKYASM_EXT  = ".ssa"
 CA65ASM_EXT = ".s"
@@ -17,29 +20,53 @@ def emit_proc(functions):
         out.append(f"\n; callable in C as \"void {name}(void);\"")
         out.append(f"{name}:")
 
-        i = 0
-        while i < len(code):
-            byte = code[i]
-            if i < len(code) - 1 and nes_register_identifier(code, i):
-                if byte < 0:
-                    byte += 256
-                if byte < 0 or byte > 255:
-                    print(f"Error: invalid opcode byte: {byte}")
-                    sys.exit(1)
-                out.append(f"\tlda #${byte:02X}")
-                out.append(f"\tsta ${SKYRETRO_CMD_PORT:04X}")
-                register_asm_line = f"\t{get_asm_for_register_by_identifier(code[i + 1])} ${SKYRETRO_CMD_PORT:04X}"
-                out.append(register_asm_line)
-                i += 2
+        nes_a_register_use_count = count_nes_a_register_uses(code)
+        uses_nes_a_register = nes_a_register_use_count > 0
+        a_value_preserved = False
+
+        if uses_nes_a_register:
+            out.append(f"\t; function uses NES A register, preserve its value")
+            out.append(f"\tpha")
+            a_value_preserved = True
+
+        for instruction in code:
+            if isinstance(instruction, nativeASM):
+                out.append(f"\t; native assembly block")
+                for line in instruction.lines:
+                    out.append(f"\t{line}")
                 continue
-            if byte < 0:
-                byte += 256
-            if byte < 0 or byte > 255:
-                print(f"Error: invalid opcode byte: {byte}")
-                sys.exit(1)
-            out.append(f"\tlda #${byte:02X}")
-            out.append(f"\tsta ${SKYRETRO_CMD_PORT:04X}")
-            i += 1
+
+            if isinstance(instruction, skyasmInstruction):
+                opcode = MNEMONIC_TO_OPCODE[instruction.mnemonic]
+                out.append(f"\tlda #${opcode:02X}")
+                out.append(f"\tsta ${SKYRETRO_CMD_PORT:04X}")
+
+                for operand in instruction.operands:
+                    if isinstance(operand, NESRegisterOperand):
+                        reg = operand.register
+                        if reg == "A":
+                            if a_value_preserved:
+                                out.append("\tpla")
+                            a_value_preserved = False
+
+                            out.append(f"\tsta ${SKYRETRO_CMD_PORT:04X}")
+
+                            out.append("\tpha")
+                            a_value_preserved = True
+                        else:
+                            out.append(f"\t{NES_REGISTERS[operand.register]} ${SKYRETRO_CMD_PORT:04X}")
+                    else:
+                        if operand < 0:
+                            operand += 256
+                        if operand < 0 or operand > 255:
+                            print(f"Error: invalid operand byte: {operand}")
+                            sys.exit(1)
+                        out.append(f"\tlda #${operand:02X}")
+                        out.append(f"\tsta ${SKYRETRO_CMD_PORT:04X}")
+
+        if a_value_preserved:
+            out.append(f"\t; restore NES A register value")
+            out.append(f"\tpla")
 
         out.append(f"\trts")
     return "\n".join(out)

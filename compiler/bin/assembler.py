@@ -1,39 +1,11 @@
 import os
 import sys
 
-from dependencies.isa import MNEMONIC_TO_OPCODE, OPERAND_COUNTS
+from parser           import parse
 from out              import CA65ASM_EXT, SKYASM_EXT, emit_proc
-from tokenizer        import parse_operand, tokens_empty, tokenize
+from tokenizer        import tokens_empty, tokenize
 
-def handle_func(lines):
-    global base_file
-
-    code = []
-    for line in lines:
-        tokens = tokenize(line)
-        if tokens_empty(tokens):
-            continue
-
-        mnemonic = tokens[0].lower()
-        if mnemonic in MNEMONIC_TO_OPCODE:
-            opcode = MNEMONIC_TO_OPCODE[mnemonic]
-            operand_count = OPERAND_COUNTS[opcode]
-
-            code.append(opcode)
-
-            for i in range(operand_count):
-                if len(tokens) > i + 1:
-                    operand = parse_operand(tokens[i + 1])
-                    code.append(operand)
-                else:
-                    print(f"Error: {mnemonic} expects {operand_count} operand(s)")
-                    sys.exit(1)
-        else:
-            print(f"Error: unknown instruction: \"{mnemonic}\"")
-            sys.exit(1)
-    return code
-
-# we wanna convert the SkyASM file down to the byte-level instructions
+# we wanna convert the SkyASM file down to identifiers
 # and then wrap in 6502 asm to stream to the command port
 # then ca65 will assemble the out .s
 def assembler_act(file):
@@ -57,7 +29,7 @@ def assembler_act(file):
                 print(f"Error: unexpected \"{' '.join(tokens[1:])}\" on line {line_num}")
                 sys.exit(1)
             if current_function:
-                code = handle_func(function)
+                code = parse(function)
                 functions.append((current_function, code))
             current_function = token[:-1]
             function = []
@@ -70,7 +42,7 @@ def assembler_act(file):
         line_num += 1
     
     if current_function:
-        code = handle_func(function)
+        code = parse(function)
         functions.append((current_function, code))
         current_function = None
         function = []

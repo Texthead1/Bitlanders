@@ -1,20 +1,4 @@
 _test:
-    elmg
-    eler
     ldr #$FF
-    ldg #$FF
-    ldb #$FF
     ldr 'A'
     ldg "X"
-    ldb 'Y'
-    rgb
-
-_test2:
-    elm 10
-    elm 7
-    elm 6
-    elm 5
-    elm 4
-    elm 3
-    elm 2
-    elm -1

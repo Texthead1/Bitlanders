@@ -2,7 +2,7 @@ import os
 import sys
 
 from assembler import assembler_act
-from out import CA65ASM_EXT, SKYASM_EXT
+from out       import CA65ASM_EXT, SKYASM_EXT
 
 # TODO: detect duplicate function names
 # TODO: better error handling

@@ -11,10 +11,9 @@ The NES ROM uses an extended MMC3 mapper which houses an additional attached cop
 The ROM's iNES header declares it as using the regular MMC3 mapper, not a custom mapper. The result of this is that the ROM remains bootable on any MMC3 mapper-compatible emulator/flashcart. However, no SPIC-related functionality will be present.
 
 Bitlanders specifically is designed to be playable with and without the extended MMC3 mapper.
-- With the extended mapper:
-  - The game plays as intended, with added features made possible due to the SPIC.
-- With the original MMC3 hardware:
-  - The game still remains playable, with core functionality intact. SPIC-added features are stripped.
+With the extended mapper                                                       | With the original MMC3 hardware
+-------------------------------------------------------------------------------|--------------------------------
+The game plays as intended, with added features made possible due to the SPIC. | The game still remains playable, with core functionality intact. SPIC-added features are stripped.
 
 This game is a work-in-progress. It has been tested and verified to function correctly on a PAL-Region NES using an Everdrive N8 Pro, and should work on other region consoles as well. Footage of the game can be found [here](https://youtu.be/S8j5wWYvC68).
 
