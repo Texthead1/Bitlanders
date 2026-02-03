@@ -4,13 +4,9 @@ import sys
 from assembler import assembler_act
 from out       import CA65ASM_EXT, SKYASM_EXT
 
-# TODO: detect duplicate function names
-# TODO: better error handling
-# TODO: add inline 6502 asm (PHA and PLA are musts)
-
 VERBOSE = False
-ASM_LOG_FILE = "skyas_assembled.txt"
-OBJ_LIST_FILE = "skyas_objlist.txt"
+ASM_LOG_FILE = "skysa_assembled.txt"
+OBJ_LIST_FILE = "skysa_objlist.txt"
 
 def assemble():
     out_files = []
@@ -55,31 +51,37 @@ def clean():
                 os.remove(filename)
 
 def help():
-    print("Usage: python skyas.py [--asmc | --clean] [--verbose]")
-    print("  --asmc, -a     : Assemble all SkyASM .ssa files in directory")
-    print("  --clean, -c    : Clean all wrapped files in directory")
-    print("  --verbose, -v  : Enable verbose output")
-    print("  --help, -h     : Show this help message")
+    print("Usage: python skysa.py [--asmc | --clean] [--verbose]")
+    print("\nOptions:")
+    print("  --asmc, -a       Assemble all SkyASM .ssa files in directory")
+    print("  --clean, -c      Clean all wrapped files in directory")
+    print("  --verbose, -v    Enable verbose output")
+    print("  --help, -h       Show this help message")
     sys.exit(0)
 
-if __name__ == "__main__":
-    if (len(sys.argv) < 2 or len(sys.argv) > 3 or sys.argv[1] in ["--help", "-h"]):
-        help()
-    if len(sys.argv) == 3:
-        if sys.argv[2] in ["--verbose", "-v"]:
-            VERBOSE = True
-        else:
-            print(f"Unknown argument: {sys.argv[2]}")
-            sys.exit(1)
 
-    match sys.argv[1]:
-        case "--asmc":
-            assemble()
-        case "-a":
-            assemble()
-        case "--clean":
-            clean()
-        case "-c":
-            clean()
-        case _:
-            print(f"Unknown argument: {sys.argv[1]}")
+if __name__ == "__main__":
+    args = sys.argv[1:]
+
+    if not args or "--help" in args or "-h" in args:
+        help()
+
+    if "--verbose" in args:
+        VERBOSE = True
+        args.remove("--verbose")
+    if "-v" in args:
+        VERBOSE = True
+        args.remove("-v")
+
+    if len(args) != 1:
+        print("Error: expected a single action (--asmc or --clean)")
+        help()
+
+    action = args[0]
+    if action in ("--asmc", "-a"):
+        assemble()
+    elif action in ("--clean", "-c"):
+        clean()
+    else:
+        print(f"Unknown argument: {action}")
+        help()

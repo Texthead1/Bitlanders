@@ -4,6 +4,7 @@
 #include "../engine/mapper/mmc3/mmc3_code.h"
 #include "../engine/mapper/mmc3/mmc3_code.c"
 #include "portal/portal_init.h"
+//#include "portal/testing.h"
 #include "characters/bean.h"
 #include "metatiles.h"
 #include "title.h"

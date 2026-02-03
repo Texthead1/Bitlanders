@@ -1,4 +1,10 @@
-_test:
-    ldr #$FF
-    ldr 'A'
-    ldg "X"
+_testing:
+.native
+    ldx #$0A
+loop:
+.endnative
+    ldr 'X'
+.native
+    dex
+    bne loop
+.endnative

@@ -1,4 +1,5 @@
 import sys
+
 from dependencies.data_types import nativeASM, skyasmInstruction
 from dependencies.isa        import MNEMONIC_TO_OPCODE
 from dependencies.nes        import NES_REGISTERS, NESRegisterOperand
@@ -31,9 +32,10 @@ def emit_proc(functions):
 
         for instruction in code:
             if isinstance(instruction, nativeASM):
-                out.append(f"\t; native assembly block")
+                out.append(f"\n\t; native assembly block")
                 for line in instruction.lines:
                     out.append(f"\t{line}")
+                out.append(f"\t; end of native assembly\n")
                 continue
 
             if isinstance(instruction, skyasmInstruction):
@@ -47,12 +49,14 @@ def emit_proc(functions):
                         if reg == "A":
                             if a_value_preserved:
                                 out.append("\tpla")
-                            a_value_preserved = False
+                                nes_a_register_use_count -= 1
+                                a_value_preserved = False
 
                             out.append(f"\tsta ${SKYRETRO_CMD_PORT:04X}")
 
-                            out.append("\tpha")
-                            a_value_preserved = True
+                            if nes_a_register_use_count > 0:
+                                out.append("\tpha")
+                                a_value_preserved = True
                         else:
                             out.append(f"\t{NES_REGISTERS[operand.register]} ${SKYRETRO_CMD_PORT:04X}")
                     else:
@@ -64,6 +68,7 @@ def emit_proc(functions):
                         out.append(f"\tlda #${operand:02X}")
                         out.append(f"\tsta ${SKYRETRO_CMD_PORT:04X}")
 
+        # SOMETHING IS WRONG, why is there a value left on the stack
         if a_value_preserved:
             out.append(f"\t; restore NES A register value")
             out.append(f"\tpla")

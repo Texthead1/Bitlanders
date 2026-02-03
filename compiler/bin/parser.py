@@ -1,10 +1,9 @@
-
 import sys
 
 from dependencies.data_types import nativeASM, skyasmInstruction
 from dependencies.isa        import MNEMONIC_TO_OPCODE, OPERAND_COUNTS
 from dependencies.nes        import NES_REGISTERS, NESRegisterOperand
-from tokenizer               import token_amount_not_expected, tokenize, tokens_empty
+from tokenizer               import strip_comments, token_amount_not_expected, tokenize, tokens_empty
 
 def count_nes_a_register_uses(code):
     count = 0
@@ -43,36 +42,38 @@ def parse(lines):
     native_block_lines = []
     for line in lines:
         tokens = tokenize(line)
+        line = strip_comments(line)
+
         if tokens_empty(tokens):
             continue
 
-        mnemonic = tokens[0].lower()
-
-        if mnemonic == ".native":
+        if line == ".native":
             if native_asm:
                 print("Error: already in .native block")
                 sys.exit(1)
             if token_amount_not_expected(tokens, 1):
-                print(f"Error: unexpected {' '.join(tokens[1:])} after {mnemonic}")
+                print(f"Error: unexpected {' '.join(tokens[1:])} after {tokens[0]}")
                 sys.exit(1)
             native_asm = True
             continue
 
-        if mnemonic == ".endnative":
+        if line == ".endnative":
             if not native_asm:
                 print("Error: not in .native block")
                 sys.exit(1)
             if token_amount_not_expected(tokens, 1):
-                print(f"Error: unexpected {' '.join(tokens[1:])} after {mnemonic}")
+                print(f"Error: unexpected {' '.join(tokens[1:])} after {tokens[0]}")
                 sys.exit(1)
             native_asm = False
             code.append(nativeASM(native_block_lines))
+            native_block_lines = []
             continue
 
         if native_asm:
             native_block_lines.append(line.strip())
             continue
 
+        mnemonic = tokens[0].lower()
         if mnemonic in MNEMONIC_TO_OPCODE:
             operand_count = OPERAND_COUNTS[MNEMONIC_TO_OPCODE[mnemonic]]
 

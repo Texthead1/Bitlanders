@@ -28,6 +28,7 @@ void main(void) {
     temp_u16_0 = INIT_SCREEN_SCROLL_Y;
     skyretro_set_test_shared_s16();
     portal_init();
+    //testing();
 
     game_state = STATE_TITLE;
     unground_speed = 0;
