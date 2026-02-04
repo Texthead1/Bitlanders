@@ -1,4 +1,4 @@
-#include "characters/bean.h"
+#include "characters/23_wreckingball.h"
 #include "../lib/libnes/neslib.h"
 
 const unsigned char bean_stand[] = {

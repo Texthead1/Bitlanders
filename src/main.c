@@ -7,10 +7,15 @@
 #pragma code-name ("CODE")	
 
 void main(void) {
+    set_mirroring(MIRROR_VERTICAL);
+    irq_array[0] = 0xFF;
+    set_irq_ptr(irq_array); 
+
     ppu_off();
     pal_spr(title_palette_sprites);
 
     POKE(0x8000, 0);
+    memfill(wram_array, 0, 0x2000); 
 
     vram_adr(NAMETABLE_A);
     vram_unrle(title1);
@@ -24,8 +29,8 @@ void main(void) {
 
     PLAYER_SET_DIRECTION(FACING_RIGHT);
     PLAYER_SET_GROUNDED(FALSE);
+
     oam_spr(245, 162, 0xFE, 0x01);
-    temp_u16_0 = INIT_SCREEN_SCROLL_Y;
     skyretro_set_test_shared_s16();
     portal_init();
     //testing();
@@ -34,6 +39,7 @@ void main(void) {
     unground_speed = 0;
     profile = 0;
     has_hat = 0;
+    temp_u16_0 = INIT_SCREEN_SCROLL_Y;
 
     music_play(0);
     ppu_on_all();
@@ -251,8 +257,6 @@ void main(void) {
         if (pad1_new & PAD_START && !lock_controls) {
             boot:
             if (game_state == STATE_TITLE) {
-                //pal_clear();
-                //delay(1);
                 game_state = STATE_0;
                 set_vram_buffer();
                 oam_clear();
@@ -260,6 +264,11 @@ void main(void) {
                 music_stop();
                 bank_spr(1);
                 pal_fade_to(0, 4);
+
+                // load bean into second pattern table
+                set_chr_mode_0(0x0C);
+                set_chr_mode_1(0x0D);
+
                 game_begun = TRUE;
                 lock_controls = TRUE;
             } else {
@@ -327,12 +336,18 @@ void change_scene(void) {
         pal_spr(bean_palette);
         set_scroll_y(0xFF);
         set_scroll_x(0);
+
         ppu_off();
         vram_adr(NAMETABLE_A);
         vram_fill(0,1024);
         ppu_on_all();
         write_emu_text();
-        POKE(0x8000, 1);
+
+        set_chr_mode_2(0x08);
+        set_chr_mode_3(0x09);
+        set_chr_mode_4(0x0A);
+        set_chr_mode_5(0x0B);
+
         if (!use_player_palette_for_hat) {
             set_hat_palette(current_hat);
         } else {
@@ -342,19 +357,29 @@ void change_scene(void) {
         pal_bg(echo_palette);
         pal_spr(echo_palette);
         set_scroll_x(0);
+
         ppu_off();
         vram_adr(NAMETABLE_A);
         vram_unrle(echo);
         ppu_on_all();
-        POKE(0x8000, 2);
+
+        set_chr_mode_2(0x0D);
+        set_chr_mode_3(0x0E);
+        set_chr_mode_4(0x0F);
+        set_chr_mode_5(0x10);
     } else {
         pal_bg(palette);
         pal_spr(bean_palette);
-        PLAYER_SET_GROUNDED(FALSE);
-        //cam_x = 0;
         set_scroll_x(cam_x);
+
+        PLAYER_SET_GROUNDED(FALSE);
         load_room();
-        POKE(0x8000, 1);
+
+        set_chr_mode_2(0x08);
+        set_chr_mode_3(0x09);
+        set_chr_mode_4(0x0A);
+        set_chr_mode_5(0x0B);
+
         if (!use_player_palette_for_hat) {
             set_hat_palette(current_hat);
         } else {

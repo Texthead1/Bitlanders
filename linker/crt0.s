@@ -331,6 +331,7 @@ sounds_data:
 .segment "CHARS"
 	.incbin "../assets/chr/title.chr"
 	.incbin "../assets/chr/test.chr"
+	.incbin "../assets/chr/characters/23_wreckingball.chr"
 	.incbin "../assets/chr/echo.chr"
 
 .segment "CODE"

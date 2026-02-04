@@ -5,7 +5,7 @@
 #include "../engine/mapper/mmc3/mmc3_code.c"
 #include "portal/portal_init.h"
 //#include "portal/testing.h"
-#include "characters/bean.h"
+#include "characters/23_wreckingball.h"
 #include "metatiles.h"
 #include "title.h"
 #include "echo.h"
@@ -294,6 +294,9 @@ unsigned char profile;
 unsigned char wram_array[0x2000];
 
 #pragma bss-name(pop)
+
+unsigned char irq_array[32];
+unsigned char double_buffer[32];
 
 // ENTITY VARIABLES
 typedef struct {
