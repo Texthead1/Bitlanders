@@ -3,18 +3,24 @@
 #define XPOS 6
 #define YPOS 8
 
-#pragma rodata-name ("CODE")
-#pragma code-name ("CODE")	
+#pragma rodata-name("CODE")
+#pragma code-name("CODE")
+
+void set_irq_handler(void (*handler)(void)) {
+    irq_handler_ptr[0] = (unsigned char)((unsigned)handler & 0xFF);
+    irq_handler_ptr[1] = (unsigned char)(((unsigned)handler >> 8) & 0xFF);
+}
+
+void irq_stub(void) {
+    __asm__("rti");
+}
 
 void main(void) {
     set_mirroring(MIRROR_VERTICAL);
-    irq_array[0] = 0xFF;
-    set_irq_ptr(irq_array); 
 
     ppu_off();
     pal_spr(title_palette_sprites);
 
-    POKE(0x8000, 0);
     memfill(wram_array, 0, 0x2000); 
 
     vram_adr(NAMETABLE_A);
@@ -308,6 +314,8 @@ void main(void) {
 
             // LEVEL LOADING SYSTEM
             case STATE_2:
+                pal_bg(palette);
+                setup_water_irq(0xC2);
                 if (pad1_poll & PAD_SELECT && !lock_controls) {
                     if (pad1_new & PAD_UP) {
                         ++level_pointer;
@@ -348,6 +356,8 @@ void change_scene(void) {
         set_chr_mode_4(0x0A);
         set_chr_mode_5(0x0B);
 
+        set_irq_handler(irq_stub);
+
         if (!use_player_palette_for_hat) {
             set_hat_palette(current_hat);
         } else {
@@ -367,6 +377,8 @@ void change_scene(void) {
         set_chr_mode_3(0x0E);
         set_chr_mode_4(0x0F);
         set_chr_mode_5(0x10);
+
+        set_irq_handler(irq_stub);
     } else {
         pal_bg(palette);
         pal_spr(bean_palette);
@@ -379,6 +391,8 @@ void change_scene(void) {
         set_chr_mode_3(0x09);
         set_chr_mode_4(0x0A);
         set_chr_mode_5(0x0B);
+
+        set_irq_handler(water_irq);
 
         if (!use_player_palette_for_hat) {
             set_hat_palette(current_hat);

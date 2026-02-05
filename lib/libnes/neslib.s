@@ -125,7 +125,7 @@ nmi:
     lda <PPU_CTRL_VAR
     sta PPU_CTRL
         
-    jsr irq_parser ; needs to happen inside v-blank... 
+    ;jsr irq_parser ; needs to happen inside v-blank... 
                    ; so goes before the music
             ; but, if screen is off this should be skipped
 

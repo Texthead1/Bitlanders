@@ -30,9 +30,9 @@ typedef enum {
 // bits 1-2 - state of emulation (for use with portal)
 // bits 3-7 - unused
 extern volatile unsigned char emu_flags;
-#pragma zpsym ("emu_flags");
+#pragma zpsym("emu_flags");
 extern volatile unsigned char emu_flags_prev;
-#pragma zpsym ("emu_flags_prev");
+#pragma zpsym("emu_flags_prev");
 
 signed int shared_s16_0;
 

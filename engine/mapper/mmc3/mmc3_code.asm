@@ -34,11 +34,13 @@
     mmc3_ptr:        .res 2 ; array for the irq parser
     mmc3_index:        .res 1 ; index to this array
     irq_done:        .res 1
+    _irq_handler_ptr: .res 2
 
     
 ;   .exportzp mmc3_8000_PRG, mmc3_8001_PRG, mmc3_8000_CHR, mmc3_8001_CHR
     .exportzp BP_BANK_8000, mmc3_8000
     .exportzp mmc3_ptr, mmc3_index, irq_done
+    .exportzp _irq_handler_ptr
     
 
 .segment "STARTUP"
@@ -206,23 +208,23 @@ default_array: ;just an eof terminator
 
     
 irq:
-    pha
-    txa
-    pha
-    tya
-    pha
+    ;pha
+    ;txa
+    ;pha
+    ;tya
+    ;pha
     
-    sta $e000    ; disable mmc3 irq
+    ;sta $e000    ; disable mmc3 irq
                 ; any value will do
     
-    jsr irq_parser
+    jmp (_irq_handler_ptr)
     
-    pla
-    tay
-    pla
-    tax
-    pla
-    rti
+    ;pla
+    ;tay
+    ;pla
+    ;tax
+    ;pla
+    ;rti
     
     
 ;format
