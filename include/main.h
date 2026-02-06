@@ -51,6 +51,8 @@ unsigned char pad1_new;
 
 signed int cam_x;
 signed int cam_y;
+signed int cam_latch_x;
+signed int cam_latch_y;
 
 // PLAYER VARIABLES
 #define ACCELERATION 0x20

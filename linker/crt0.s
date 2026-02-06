@@ -333,6 +333,7 @@ sounds_data:
 	.incbin "../assets/chr/test.chr"
 	.incbin "../assets/chr/characters/23_wreckingball.chr"
 	.incbin "../assets/chr/echo.chr"
+	.incbin "../assets/chr/blank.chr"
 
 .segment "CODE"
 	.include "../lib/famitone2.s"

@@ -273,7 +273,6 @@ void main(void) {
 
                 // load bean into second pattern table
                 set_chr_mode_0(0x0C);
-                set_chr_mode_1(0x0D);
 
                 game_begun = TRUE;
                 lock_controls = TRUE;
@@ -644,6 +643,9 @@ void debug_movement(void) {
 }
 
 void player_scroll(void) {
+    cam_latch_x = cam_x;
+    cam_latch_y = cam_y;
+
     if (high_byte(player.x) > CAM_BOUND_RIGHT) {
         temp_u8_0 = MIN(6, high_byte(player.x) - CAM_BOUND_RIGHT);
         cam_x += temp_u8_0;
