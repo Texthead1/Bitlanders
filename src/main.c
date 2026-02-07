@@ -6,15 +6,6 @@
 #pragma rodata-name("CODE")
 #pragma code-name("CODE")
 
-void set_irq_handler(void (*handler)(void)) {
-    irq_handler_ptr[0] = (unsigned char)((unsigned)handler & 0xFF);
-    irq_handler_ptr[1] = (unsigned char)(((unsigned)handler >> 8) & 0xFF);
-}
-
-void irq_stub(void) {
-    __asm__("rti");
-}
-
 void main(void) {
     set_mirroring(MIRROR_VERTICAL);
 
@@ -335,6 +326,15 @@ void main(void) {
             gray_line();
         }
     }
+}
+
+void set_irq_handler(void (*handler)(void)) {
+    irq_handler_ptr[0] = (unsigned char)((unsigned)handler & 0xFF);
+    irq_handler_ptr[1] = (unsigned char)(((unsigned)handler >> 8) & 0xFF);
+}
+
+void irq_stub(void) {
+    __asm__("rti");
 }
 
 void change_scene(void) {
@@ -1156,6 +1156,13 @@ void draw_player(void) {
     }
 
     draw:
-    if (has_hat) oam_meta_spr(high_byte(player.x) + (PLAYER_FACING_RIGHT ? accessory_offset_x : -accessory_offset_x), high_byte(player.y) - accessory_offset_y, hats[current_hat][PLAYER_FACING_RIGHT ? 0 : 1][current_hat_frame]);
+    if (has_hat)
+        oam_meta_spr(high_byte(player.x) +
+            (PLAYER_FACING_RIGHT
+                ? accessory_offset_x
+                : -accessory_offset_x),
+            high_byte(player.y) - accessory_offset_y,
+            hats[current_hat][PLAYER_FACING_RIGHT ? 0 : 1][current_hat_frame]);
+
     oam_meta_spr(high_byte(player.x), high_byte(player.y), current_anim);
 }

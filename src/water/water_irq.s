@@ -1,3 +1,5 @@
+.include "../../include/common.inc"
+
 .import _water_palette
 .import irq_handler_ptr
 .importzp _cam_latch_x
@@ -19,144 +21,38 @@ _water_irq:
 
     sta $E000
 
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
+    nop_for 36
 
-    sta $2001 ; rendering off
-    stx $2006 ; palette
-    sta $2006
-    sty $2007 ; set palette color
+    sta PPU_MASK
+    stx PPU_ADDR
+    sta PPU_ADDR
+    sty PPU_DATA
 
-    sta $8000
+    sta BANK_REG
     lda #$12
-    sta $8001
-    ldy #%00101110
-    sty $2001
+    ldy #%10001110
+    sty PPU_MASK
+    sta CHR_ID_REG
 
     ldy _cam_latch_x
-    sty $2005
+    sty PPU_SCROLL
     ldy _cam_latch_y
-    sty $2005
+    sty PPU_SCROLL
 
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
+    nop_for 35
 
-    lda #$00
-    sta $8000
+    sta BANK_REG
     lda #$08
-    sta $8001
+    sta CHR_ID_REG
     lda #$80
-    sta $8000
+    sta BANK_REG
     lda #$0C
-    sta $8001
+    sta CHR_ID_REG
 
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
+    nop_for 46
 
-    ldy #%00111110
-    sty $2001
+    ldy #%10011110
+    sty PPU_MASK
 
     pla
     tay
