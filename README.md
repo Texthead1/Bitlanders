@@ -18,12 +18,16 @@ The game plays as intended, with added features made possible due to the SPIC. |
 This game is a work-in-progress. It has been tested and verified to function correctly on a PAL-Region NES using an Everdrive N8 Pro, and should work on other region consoles as well. Footage of the game can be found [here](https://youtu.be/S8j5wWYvC68).
 
 ## Building
-Both a 6502 assembler/compiler/linker toolchain and `python` must be installed on the machine.
+Both a 6502 assembler/compiler/linker toolchain and `python` must be installed on the machine. Python 3.10+ and above is supported. 3.9 and below will not work.
 
-The included `build.bat` expects the cc65 toolchain, and to be at the relative path `..\..\cc65\`, but feel free to modify the file path to suit your needs.
+The included `build.bat` expects the cc65 toolchain, and to be at the relative path `..\cc65\`, but feel free to modify the file path to suit your needs.
 - cc65 can be found [here](https://cc65.github.io/)
   - Navigate to the bottom of the page and download the Windows Snapshot release
   - Unpack the archive to the correct directory and make sure the `build.bat` references the cc65 binaries
+
+Running `build.bat` should correctly build the game to `build\bitlanders.nes`. If the `build` folder doesn't exist, the script will throw a warning.
+
+`build.bat` will also output a labels file (`bitlanders.lbl`) and compiled 6502 assembly code from C (`main.s`). These files are for debugging purposes and can largely be ignored.
 
 As a batch file is used for automated building, it can only be used to build the ROM on Windows machines. The ROM should be buildable on other platforms with alternate build processes.
 
