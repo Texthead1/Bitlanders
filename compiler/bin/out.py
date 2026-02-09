@@ -3,7 +3,7 @@ import sys
 from dependencies.data_types import nativeASM, skyasmInstruction
 from dependencies.isa        import MNEMONIC_TO_OPCODE
 from dependencies.nes        import NES_REGISTERS, NESRegisterOperand
-from parser                  import count_nes_a_register_uses
+from func_parser             import count_nes_a_register_uses
 
 SKYASM_EXT  = ".ssa"
 CA65ASM_EXT = ".s"
@@ -14,7 +14,7 @@ SKYRETRO_CMD_PORT = 0x4028
 # which wraps the SkyASM instructions and streams them to the command port
 def emit_proc(functions):
     out = []
-    out.append(f".export {",".join([name for name, _ in functions])}\n")
+    out.append(f".export {','.join([name for name, _ in functions])}\n")
     out.append(f".segment \"CODE\"")
 
     for name, code in functions:

@@ -2,8 +2,8 @@
 setlocal enabledelayedexpansion
 
 set out="bitlanders"
-set path=%path%;..\..\cc65\bin\
-set CC65_HOME=..\..\cc65\
+set path=%path%;..\cc65\bin\
+set CC65_HOME=..\cc65\
 set path=%path%;compiler\
 
 call skysa --asmc

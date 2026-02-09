@@ -1,7 +1,7 @@
 import os
 import sys
 
-from parser           import parse
+from func_parser      import parse
 from out              import CA65ASM_EXT, SKYASM_EXT, emit_proc
 from tokenizer        import strip_comments, token_amount_not_expected, tokens_empty, tokenize
 

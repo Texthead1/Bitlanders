@@ -17,8 +17,13 @@ def assemble():
                 if VERBOSE: print("Assembling file: " + filename)
                 assembler_act(os.path.join(root, filename))
                 if VERBOSE: print(f"Assembled: {filename}")
-                out_files.append(os.path.join(root.removeprefix(".\\"), os.path.splitext(filename)[0] + CA65ASM_EXT))
-                obj_list.append(os.path.join(root.removeprefix(".\\"), os.path.splitext(filename)[0] + ".o"))
+                clean_root = os.path.relpath(root, ".")
+                if clean_root == ".":
+                    clean_root = ""
+
+                out_files.append(os.path.join(clean_root, os.path.splitext(filename)[0] + CA65ASM_EXT))
+                obj_list.append(os.path.join(clean_root, os.path.splitext(filename)[0] + ".o"))
+
 
     match (len(out_files)):
         case 0: return

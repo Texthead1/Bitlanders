@@ -8,6 +8,8 @@
 .segment "CODE"
 .export _water_irq
 
+.define WATER_SURFACE #$01
+
 _water_irq:
     pha
     txa
@@ -17,7 +19,7 @@ _water_irq:
 
     lda #$00
     ldx #$3F
-    ldy #$01
+    ldy WATER_SURFACE
 
     sta $E000
 
