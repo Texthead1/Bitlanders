@@ -318,6 +318,7 @@ void main(void) {
                 oam_clear();
                 player_movement();
                 draw_player();
+                draw_water();
                 break;
         }
         skyretro_update();
@@ -340,7 +341,7 @@ void irq_stub(void) {
 void change_scene(void) {
     if (game_state == STATE_0) {
         pal_bg(palette);
-        pal_spr(bean_palette);
+        pal_spr(wreckingball_palette);
         set_scroll_y(0xFF);
         set_scroll_x(0);
 
@@ -380,7 +381,7 @@ void change_scene(void) {
         set_irq_handler(irq_stub);
     } else {
         pal_bg(palette);
-        pal_spr(bean_palette);
+        pal_spr(wreckingball_palette);
         set_scroll_x(cam_x);
 
         PLAYER_SET_GROUNDED(FALSE);
@@ -393,6 +394,10 @@ void change_scene(void) {
 
         set_irq_handler(water_irq);
 
+        pal_col(0x1D, water_palette[1]);
+        pal_col(0x1E, water_palette[2]);
+        pal_col(0x1F, water_palette[3]);
+        
         if (!use_player_palette_for_hat) {
             set_hat_palette(current_hat);
         } else {
@@ -1069,9 +1074,9 @@ void set_hat_palette(const char i) {
 }
 
 void set_hat_palette_to_player(void) {
-    pal_col(0x15, bean_palette[1]);
-    pal_col(0x16, bean_palette[2]);
-    pal_col(0x17, bean_palette[3]);
+    pal_col(0x15, wreckingball_palette[1]);
+    pal_col(0x16, wreckingball_palette[2]);
+    pal_col(0x17, wreckingball_palette[3]);
 }
 
 void set_accessory_frame(const char i) {
@@ -1086,19 +1091,19 @@ void draw_player(void) {
     accessory_offset_x = 0;
     accessory_offset_y = 3;
 
-    if (current_anim != bean_walk_anim[0] || current_anim != bean_walk_anim[1] || current_anim != bean_walk_anim[2] || current_anim != bean_walk_anim_flipped[0] || current_anim != bean_walk_anim_flipped[1] || current_anim != bean_walk_anim_flipped[2]) {
+    if (current_anim != wreckingball_walk_anim[0] || current_anim != wreckingball_walk_anim[1] || current_anim != wreckingball_walk_anim[2] || current_anim != wreckingball_walk_anim_flipped[0] || current_anim != wreckingball_walk_anim_flipped[1] || current_anim != wreckingball_walk_anim_flipped[2]) {
         if (player.vel_x <= RUN_THRESHOLD && player.vel_x >= -RUN_THRESHOLD)
             current_anim_frame = 0;
     }
 
     if (!PLAYER_IS_GROUNDED) {
         if (player.vel_y < 0) {
-            set_player_anim(PLAYER_FACING_RIGHT ? bean_jump : bean_jump_flipped);
+            set_player_anim(PLAYER_FACING_RIGHT ? wreckingball_jump : wreckingball_jump_flipped);
             set_accessory_frame(1);
             accessory_offset_x = -1;
             accessory_offset_y = 5;
         } else {
-            set_player_anim(PLAYER_FACING_RIGHT ? bean_fall : bean_fall_flipped);
+            set_player_anim(PLAYER_FACING_RIGHT ? wreckingball_fall : wreckingball_fall_flipped);
             set_accessory_frame(0);
             accessory_offset_y = 5;
         }
@@ -1106,12 +1111,12 @@ void draw_player(void) {
     }
 
     if (player.vel_x == 0) {
-        if (current_anim != bean_idle && current_anim != bean_idle_flipped) {
-            if (player.anim_timer > 0x8A && (current_anim == bean_stand || current_anim == bean_stand_flipped)) {
-                set_player_anim(PLAYER_FACING_RIGHT ? bean_idle : bean_idle_flipped);
+        if (current_anim != wreckingball_idle && current_anim != wreckingball_idle_flipped) {
+            if (player.anim_timer > 0x8A && (current_anim == wreckingball_stand || current_anim == wreckingball_stand_flipped)) {
+                set_player_anim(PLAYER_FACING_RIGHT ? wreckingball_idle : wreckingball_idle_flipped);
                 accessory_offset_y = 4; 
             } else {
-                set_player_anim(PLAYER_FACING_RIGHT ? bean_stand : bean_stand_flipped);
+                set_player_anim(PLAYER_FACING_RIGHT ? wreckingball_stand : wreckingball_stand_flipped);
                 accessory_offset_y = 3;
             }
             set_accessory_frame(0);
@@ -1119,8 +1124,8 @@ void draw_player(void) {
         goto draw;
     }
 
-    if (current_anim == bean_walk_anim[0] || current_anim == bean_walk_anim[1] || current_anim == bean_walk_anim[2] ||
-        current_anim == bean_walk_anim_flipped[0] || current_anim == bean_walk_anim_flipped[1] || current_anim == bean_walk_anim_flipped[2])
+    if (current_anim == wreckingball_walk_anim[0] || current_anim == wreckingball_walk_anim[1] || current_anim == wreckingball_walk_anim[2] ||
+        current_anim == wreckingball_walk_anim_flipped[0] || current_anim == wreckingball_walk_anim_flipped[1] || current_anim == wreckingball_walk_anim_flipped[2])
         temp_u8_0 = player.anim_timer;
     else
         temp_u8_0 = 0;
@@ -1135,7 +1140,7 @@ void draw_player(void) {
     else
         temp_u8_1 = (temp_u8_0 >> 3) & 0xF;
     
-    set_player_anim(PLAYER_FACING_RIGHT ? bean_walk_anim[temp_u8_1 & 3] : bean_walk_anim_flipped[temp_u8_1 & 3]);
+    set_player_anim(PLAYER_FACING_RIGHT ? wreckingball_walk_anim[temp_u8_1 & 3] : wreckingball_walk_anim_flipped[temp_u8_1 & 3]);
     player.anim_timer = temp_u8_0;
 
     switch ((temp_u8_1 & 3)) {
@@ -1165,4 +1170,15 @@ void draw_player(void) {
             hats[current_hat][PLAYER_FACING_RIGHT ? 0 : 1][current_hat_frame]);
 
     oam_meta_spr(high_byte(player.x), high_byte(player.y), current_anim);
+}
+
+void draw_water(void) {
+    oam_meta_spr(water_sprite_positions[0][get_frame_count() & 0x01] - water_sprite_offsets[(get_frame_count() >> 0x02) & 0x1F] - cam_x, 0xBF, water_sprite);
+    oam_meta_spr(water_sprite_positions[1][get_frame_count() & 0x01] - water_sprite_offsets[(get_frame_count() >> 0x02) & 0x1F] - cam_x, 0xBF, water_sprite);
+    oam_meta_spr(water_sprite_positions[2][get_frame_count() & 0x01] - water_sprite_offsets[(get_frame_count() >> 0x02) & 0x1F] - cam_x, 0xBF, water_sprite);
+    oam_meta_spr(water_sprite_positions[3][get_frame_count() & 0x01] - water_sprite_offsets[(get_frame_count() >> 0x02) & 0x1F] - cam_x, 0xBF, water_sprite);
+    oam_meta_spr(water_sprite_positions[4][get_frame_count() & 0x01] - water_sprite_offsets[(get_frame_count() >> 0x02) & 0x1F] - cam_x, 0xBF, water_sprite);
+    oam_meta_spr(water_sprite_positions[5][get_frame_count() & 0x01] - water_sprite_offsets[(get_frame_count() >> 0x02) & 0x1F] - cam_x, 0xBF, water_sprite);
+    oam_meta_spr(water_sprite_positions[6][get_frame_count() & 0x01] - water_sprite_offsets[(get_frame_count() >> 0x02) & 0x1F] - cam_x, 0xBF, water_sprite);
+    oam_meta_spr(water_sprite_positions[7][get_frame_count() & 0x01] - water_sprite_offsets[(get_frame_count() >> 0x02) & 0x1F] - cam_x, 0xBF, water_sprite);
 }

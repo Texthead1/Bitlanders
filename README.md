@@ -31,9 +31,6 @@ Running `build.bat` should correctly build the game to `build\bitlanders.nes`. I
 
 As a batch file is used for automated building, it can only be used to build the ROM on Windows machines. The ROM should be buildable on other platforms with alternate build processes.
 
-> [!WARNING]
-> Due to recent mapper alterations, the current build of the game is extremely unstable. It is not suggested to run the current build. Please build [this snapshot](https://github.com/Texthead1/Bitlanders/tree/b7cfe70102433b66923c19288de18846458658c9) of the repository if you want a gameplay experience.
-
 ## Acknowledgements
 External 6502 asm and C libraries that have influenced SkyRetro Engine implementations originally provided and maintained by Doug Fraker (a.k.a [nesdoug](https://github.com/nesdoug)). 
 

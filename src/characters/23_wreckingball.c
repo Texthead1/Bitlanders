@@ -1,7 +1,7 @@
 #include "characters/23_wreckingball.h"
 #include "../lib/libnes/neslib.h"
 
-const unsigned char bean_stand[] = {
+const unsigned char wreckingball_stand[] = {
     0x00, 0x00, 0x01, 0x00,
     0x08, 0x00, 0x02, 0x00,
     0x00, 0x08, 0x11, 0x00,
@@ -9,7 +9,7 @@ const unsigned char bean_stand[] = {
     0x80
 };
 
-const unsigned char bean_idle[] = {
+const unsigned char wreckingball_idle[] = {
     0x00, 0x00, 0x03, 0x00,
     0x08, 0x00, 0x04, 0x00,
     0x00, 0x08, 0x13, 0x00,
@@ -17,7 +17,7 @@ const unsigned char bean_idle[] = {
     0x80
 };
 
-const unsigned char bean_jump[] = {
+const unsigned char wreckingball_jump[] = {
     0x00, 0x00, 0x05, 0x00,
     0x08, 0x00, 0x06, 0x00,
     0x00, 0x08, 0x15, 0x00,
@@ -25,7 +25,7 @@ const unsigned char bean_jump[] = {
     0x80
 };
 
-const unsigned char bean_fall[] = {
+const unsigned char wreckingball_fall[] = {
     0x00, 0x00, 0x07, 0x00,
     0x08, 0x00, 0x08, 0x00,
     0x00, 0x08, 0x17, 0x00,
@@ -33,7 +33,7 @@ const unsigned char bean_fall[] = {
     0x80
 };
 
-const unsigned char bean_walk1[] = {
+const unsigned char wreckingball_walk1[] = {
     0x00, 0x00, 0x09, 0x00,
     0x08, 0x00, 0x0A, 0x00,
     0x00, 0x08, 0x19, 0x00,
@@ -41,7 +41,7 @@ const unsigned char bean_walk1[] = {
     0x80
 };
 
-const unsigned char bean_walk2[] = {
+const unsigned char wreckingball_walk2[] = {
     0x00, 0x00, 0x0B, 0x00,
     0x08, 0x00, 0x0C, 0x00,
     0x00, 0x08, 0x1B, 0x00,
@@ -49,7 +49,7 @@ const unsigned char bean_walk2[] = {
     0x80
 };
 
-const unsigned char bean_walk1_split[] = {
+const unsigned char wreckingball_walk1_split[] = {
     0x00, 0x00, 0x01, 0x00,
     0x08, 0x00, 0x02, 0x00,
     0x00, 0x08, 0x11, 0x00,
@@ -57,7 +57,7 @@ const unsigned char bean_walk1_split[] = {
     0x80
 };
 
-const unsigned char bean_stand_flipped[] = {
+const unsigned char wreckingball_stand_flipped[] = {
     0x00, 0x00, 0x02, 0x00 | OAM_FLIP_H,
     0x08, 0x00, 0x01, 0x00 | OAM_FLIP_H,
     0x00, 0x08, 0x12, 0x00 | OAM_FLIP_H,
@@ -65,7 +65,7 @@ const unsigned char bean_stand_flipped[] = {
     0x80
 };
 
-const unsigned char bean_idle_flipped[] = {
+const unsigned char wreckingball_idle_flipped[] = {
     0x00, 0x00, 0x04, 0x00 | OAM_FLIP_H,
     0x08, 0x00, 0x03, 0x00 | OAM_FLIP_H,
     0x00, 0x08, 0x14, 0x00 | OAM_FLIP_H,
@@ -73,7 +73,7 @@ const unsigned char bean_idle_flipped[] = {
     0x80
 };
 
-const unsigned char bean_jump_flipped[] = {
+const unsigned char wreckingball_jump_flipped[] = {
     0x00, 0x00, 0x06, 0x00 | OAM_FLIP_H,
     0x08, 0x00, 0x05, 0x00 | OAM_FLIP_H,
     0x00, 0x08, 0x16, 0x00 | OAM_FLIP_H,
@@ -81,7 +81,7 @@ const unsigned char bean_jump_flipped[] = {
     0x80
 };
 
-const unsigned char bean_fall_flipped[] = {
+const unsigned char wreckingball_fall_flipped[] = {
     0x00, 0x00, 0x08, 0x00 | OAM_FLIP_H,
     0x08, 0x00, 0x07, 0x00 | OAM_FLIP_H,
     0x00, 0x08, 0x18, 0x00 | OAM_FLIP_H,
@@ -89,7 +89,7 @@ const unsigned char bean_fall_flipped[] = {
     0x80
 };
 
-const unsigned char bean_walk1_flipped[] = {
+const unsigned char wreckingball_walk1_flipped[] = {
     0x00, 0x00, 0x0A, 0x00 | OAM_FLIP_H,
     0x08, 0x00, 0x09, 0x00 | OAM_FLIP_H,
     0x00, 0x08, 0x1A, 0x00 | OAM_FLIP_H,
@@ -97,7 +97,7 @@ const unsigned char bean_walk1_flipped[] = {
     0x80
 };
 
-const unsigned char bean_walk2_flipped[] = {
+const unsigned char wreckingball_walk2_flipped[] = {
     0x00, 0x00, 0x0C, 0x00 | OAM_FLIP_H,
     0x08, 0x00, 0x0B, 0x00 | OAM_FLIP_H,
     0x00, 0x08, 0x1C, 0x00 | OAM_FLIP_H,
@@ -105,7 +105,7 @@ const unsigned char bean_walk2_flipped[] = {
     0x80
 };
 
-const unsigned char bean_walk1_split_flipped[] = {
+const unsigned char wreckingball_walk1_split_flipped[] = {
     0x00, 0x00, 0x02, 0x00 | OAM_FLIP_H,
     0x08, 0x00, 0x01, 0x00 | OAM_FLIP_H,
     0x00, 0x08, 0x12, 0x00 | OAM_FLIP_H,
@@ -113,10 +113,10 @@ const unsigned char bean_walk1_split_flipped[] = {
     0x80
 };
 
-const unsigned char* bean_walk_anim[] = { bean_walk1, bean_walk1_split, bean_walk2, bean_walk1_split };
-const unsigned char* bean_walk_anim_flipped[] = { bean_walk1_flipped, bean_walk1_split_flipped, bean_walk2_flipped, bean_walk1_split_flipped };
+const unsigned char* wreckingball_walk_anim[] = { wreckingball_walk1, wreckingball_walk1_split, wreckingball_walk2, wreckingball_walk1_split };
+const unsigned char* wreckingball_walk_anim_flipped[] = { wreckingball_walk1_flipped, wreckingball_walk1_split_flipped, wreckingball_walk2_flipped, wreckingball_walk1_split_flipped };
 
-const unsigned char bean_palette[] = {
+const unsigned char wreckingball_palette[] = {
     0x0F, 0x01, 0x1C, 0x2A,
     0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00,

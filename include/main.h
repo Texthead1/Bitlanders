@@ -412,3 +412,4 @@ void calculate_eject_distance_down(signed char*);
 void set_hat_palette(const char);
 void set_hat_palette_to_player(void);
 void draw_player(void);
+void draw_water(void);
