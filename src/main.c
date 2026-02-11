@@ -305,7 +305,9 @@ void main(void) {
             // LEVEL LOADING SYSTEM
             case STATE_2:
                 pal_bg(palette);
-                setup_water_irq(0xC2);
+                set_irq_handler(water_irq);
+                water_scanline_index = get_frame_count() >> 2 & 0x1F;
+                setup_water_irq(0xC4);
                 if (pad1_poll & PAD_SELECT && !lock_controls) {
                     if (pad1_new & PAD_UP) {
                         ++level_pointer;
@@ -391,8 +393,6 @@ void change_scene(void) {
         set_chr_mode_3(0x09);
         set_chr_mode_4(0x0A);
         set_chr_mode_5(0x0B);
-
-        set_irq_handler(water_irq);
 
         pal_col(0x1D, water_palette[1]);
         pal_col(0x1E, water_palette[2]);

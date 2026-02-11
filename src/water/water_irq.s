@@ -1,7 +1,11 @@
 .include "../../include/common.inc"
 
-.import _water_palette
-.import irq_handler_ptr
+.importzp _water_scanline_rows_remaining
+.importzp _water_scanline_index
+.importzp _irq_handler_ptr
+
+.import _water_scanline_offsets
+
 .importzp _cam_latch_x
 .importzp _cam_latch_y
 
@@ -56,8 +60,60 @@ _water_irq:
     ldy #%10011110
     sty PPU_MASK
 
+    lda #$01
+    sta $C000
+    lda #$00
+    sta $C001
+
+    ldx #<(_water_distort_irq)
+    stx _irq_handler_ptr
+    ldx #>(_water_distort_irq)
+    stx _irq_handler_ptr+1
+
+    ;lda #$00
+    sta $E001
+
     pla
     tay
+    pla
+    tax
+    pla
+    rti
+
+_water_distort_irq:
+    pha
+    txa
+    pha
+
+    lda $E000
+
+    ldx _water_scanline_index
+    lda _water_scanline_offsets, x
+    clc
+    adc _cam_latch_x
+    sta $2005
+    lda _cam_latch_y
+    sta $2005
+
+    inx
+    txa
+    and #$1F
+    sta _water_scanline_index
+
+    dec _water_scanline_rows_remaining
+    beq @done
+
+    lda #$01
+    sta $C000
+    lda #$00
+    sta $C001
+    jmp @exit
+
+@done:
+    lda #$00
+    sta $E000
+
+@exit:
     pla
     tax
     pla
