@@ -60,9 +60,8 @@ _water_irq:
     ldy #%10011110
     sty PPU_MASK
 
-    lda #$01
-    sta $C000
     lda #$00
+    sta $C000
     sta $C001
 
     ldx #<(_water_distort_irq)
@@ -70,7 +69,6 @@ _water_irq:
     ldx #>(_water_distort_irq)
     stx _irq_handler_ptr+1
 
-    ;lda #$00
     sta $E001
 
     pla
@@ -85,7 +83,11 @@ _water_distort_irq:
     txa
     pha
 
-    lda $E000
+    lda #$00
+    sta $E000
+
+    nop_for 31
+    bit $00
 
     ldx _water_scanline_index
     lda _water_scanline_offsets, x
@@ -101,17 +103,12 @@ _water_distort_irq:
     sta _water_scanline_index
 
     dec _water_scanline_rows_remaining
-    beq @done
+    beq @exit
 
-    lda #$01
+    lda #$00
     sta $C000
-    lda #$00
     sta $C001
-    jmp @exit
-
-@done:
-    lda #$00
-    sta $E000
+    sta $E001
 
 @exit:
     pla

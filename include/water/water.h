@@ -16,6 +16,6 @@ extern const unsigned char water_palette[];
 
 extern const unsigned char water_sprite_positions[][0x02];
 extern const unsigned char water_sprite_offsets[];
-extern const unsigned char water_scanline_offsets[];
+extern const signed char water_scanline_offsets[];
 
 extern void water_irq(void);
