@@ -30,7 +30,7 @@ FT_SFX_ENABLE   = 1		;undefine to exclude all sound effects code
 	.importzp _PAD_STATE, _PAD_STATET ;added
     .include "zeropage.inc"
 
-.include "../include/common.inc"
+.include "../../../../include/common.inc"
 
 OAM_BUF		=$0200
 ;PAL_BUF	=$01c0
@@ -296,18 +296,18 @@ detectNTSC:
 
 	jmp _main			;no parameters
 
-	.include "../engine/mapper/mmc3/mmc3_code.asm"
-	.include "../lib/libnes/neslib.s"
-	.include "../lib/nesdoug/nesdoug.s"
+	.include "../../../../engine/mapper/mmc3/mmc3_code.asm"
+	.include "../../../../lib/libnes/neslib.s"
+	.include "../../../../lib/nesdoug/nesdoug.s"
 
 .segment "RODATA"
 	.global _demo_input
 _demo_input:
-	.incbin "../demogame/demo.bin"
+	.incbin "../../../../demogame/demo.bin"
 
 .segment "BANK12"
 music_data:
-	.include "../assets/music/molekin_mine.s"
+	.include "../../../../assets/music/molekin_mine.s"
 
 sounds_data:
 
@@ -317,12 +317,12 @@ sounds_data:
    	.word irq	;$fffe irq / brk
 
 .segment "CHARS"
-	.incbin "../assets/chr/title.chr"
-	.incbin "../assets/chr/test.chr"
-	.incbin "../assets/chr/characters/23_wreckingball.chr"
-	.incbin "../assets/chr/echo.chr"
-	.incbin "../assets/chr/blank.chr"
+	.incbin "../../../../assets/chr/title.chr"
+	.incbin "../../../../assets/chr/test.chr"
+	.incbin "../../../../assets/chr/characters/23_wreckingball.chr"
+	.incbin "../../../../assets/chr/echo.chr"
+	.incbin "../../../../assets/chr/blank.chr"
 
 .segment "CODE"
-	.include "../lib/famitone2.s"
-	.include "../lib/libskyretro/skyretro.s"
+	.include "../../../../lib/famitone2.s"
+	.include "../../../../lib/libskyretro/skyretro.s"
