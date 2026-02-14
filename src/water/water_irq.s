@@ -1,8 +1,9 @@
 .include "../../include/common.inc"
 
+.importzp _irq_handler_ptr
+
 .importzp _water_scanline_rows_remaining
 .importzp _water_scanline_index
-.importzp _irq_handler_ptr
 
 .import _water_scanline_offsets
 
@@ -93,9 +94,9 @@ _water_distort_irq:
     lda _water_scanline_offsets, x
     clc
     adc _cam_latch_x
-    sta $2005
+    sta PPU_SCROLL
     lda _cam_latch_y
-    sta $2005
+    sta PPU_SCROLL
 
     inx
     txa
