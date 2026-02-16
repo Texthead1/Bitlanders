@@ -5,6 +5,12 @@ set out="bitlanders"
 set path=%path%;..\cc65\bin\
 set CC65_HOME=..\cc65\
 set path=%path%;compiler\
+set MAPPER=%1
+
+if /I "%MAPPER%"=="NROM" set DEFINES=-DNROM
+if /I "%MAPPER%"=="CNROM" set DEFINES=-DCNROM
+if /I "%MAPPER%"=="MMC3" set DEFINES=-DMMC3
+if /I "%MAPPER%"=="VRC4" set DEFINES=-DVRC4
 
 call skysa --asmc
 
@@ -15,7 +21,7 @@ cc65 -Oirs src\hats\17_bone.c -Iinclude --add-source
 cc65 -Oirs src\hats\22_cowboy.c -Iinclude --add-source
 cc65 -Oirs src\water\water.c -Iinclude --add-source
 
-ca65 engine\mapper\mmc3\startup\crt0.s
+ca65 %DEFINES% engine\common\startup_common.s
 
 if not exist src\main.s pause
 
