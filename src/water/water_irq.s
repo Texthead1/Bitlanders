@@ -1,4 +1,4 @@
-.include "../../include/common.inc"
+.include "../../engine/common/common.inc"
 
 .importzp _irq_handler_ptr
 
