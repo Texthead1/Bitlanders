@@ -14,10 +14,6 @@
     .include "../mapper/mmc3/startup_mmc3.s"
 .endif
 
-.ifdef VRC4
-    .include "../mapper/vrc4/startup_vrc4.s"
-.endif
-
 .import __STACK_START__, __STACKSIZE__
 .import __ROM0_START__,  __ROM0_SIZE__
 
@@ -60,7 +56,6 @@ PPU_CTRL_VAR: 		.res 1
 PPU_CTRL_VAR1: 		.res 1
 PPU_MASK_VAR: 		.res 1
 RAND_SEED: 			.res 2
-FT_TEMP: 			.res 3
 
 TEMP: 				.res 11
 SPRID:				.res 1
@@ -85,6 +80,7 @@ META_PTR:			.res 2
 DATA_PTR:			.res 2
 
 .include "../../game/include.inc"
+.include "../../lib/libnes/neslib.s"
 
 ; implementation help from: https://nesdev.org/wiki/init_code
 start:

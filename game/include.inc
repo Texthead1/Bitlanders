@@ -1,3 +1,5 @@
+.include "../lib/famitone2/famitone2.inc"
+
 .segment "RODATA"
 	.global _demo_input
 _demo_input:

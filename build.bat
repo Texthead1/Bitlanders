@@ -10,8 +10,7 @@ set MAPPER=%1
 if /I "%MAPPER%"=="NROM" set DEFINES=-DNROM
 if /I "%MAPPER%"=="CNROM" set DEFINES=-DCNROM
 if /I "%MAPPER%"=="MMC3" set DEFINES=-DMMC3
-if /I "%MAPPER%"=="VRC4" set DEFINES=-DVRC4
-
+echo "Mapper: %MAPPER%"
 call skysa --asmc
 
 cc65 -Oirs src\main.c -Iinclude --add-source
