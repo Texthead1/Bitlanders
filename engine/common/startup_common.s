@@ -15,6 +15,8 @@
     .include "../mapper/mmc3/startup_mmc3.s"
 .endif
 
+.export _exit, __STARTUP__:absolute=1
+
 ; these are defined by cc65: https://github.com/cc65/cc65/blob/master/libsrc/
 .import   push0, popa, popax, _main, zerobss, copydata
 
@@ -85,6 +87,7 @@ DATA_PTR:           .res 2
 ; implementation help from: https://nesdev.org/wiki/init_code
 ; and: https://github.com/cc65/cc65/blob/master/libsrc/nes/crt0.s
 start:
+_exit:
     sei
     cld
 

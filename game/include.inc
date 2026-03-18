@@ -1,3 +1,5 @@
+.include "../lib/nesdoug/nesdoug.s"
+
 .segment "RODATA"
     .global _demo_input
 
