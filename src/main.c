@@ -30,7 +30,6 @@ void main(void) {
     oam_spr(245, 162, 0xFE, 0x01);
     skyretro_set_test_shared_s16();
     portal_init();
-    //testing();
 
     game_state = STATE_TITLE;
     unground_speed = 0;
@@ -633,14 +632,14 @@ void player_movement(void) {
 
 void debug_movement(void) {
     if (pad1_poll & PAD_LEFT)
-		--high_byte(player.x);
-	else if (pad1_poll & PAD_RIGHT)
-		++high_byte(player.x);
-	
-	if (pad1_poll & PAD_UP)
-		--high_byte(player.y);
-	else if (pad1_poll & PAD_DOWN)
-		++high_byte(player.y);
+        --high_byte(player.x);
+    else if (pad1_poll & PAD_RIGHT)
+        ++high_byte(player.x);
+    
+    if (pad1_poll & PAD_UP)
+        --high_byte(player.y);
+    else if (pad1_poll & PAD_DOWN)
+        ++high_byte(player.y);
     
     if (game_state == STATE_2) {
         player_scroll();

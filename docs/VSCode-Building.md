@@ -42,17 +42,17 @@ Firstly, a `.vscode` folder needs to be created in the project root. Afterwards,
     }
   ],
   "inputs": [
-      {
-          "id": "mapper",
-          "description": "Mapper:",
-          "default": "MMC3",
-          "type": "pickString",
-          "options": [
-              "NROM",
-              "CNROM",
-              "MMC3"
-          ]
-      },
+    {
+      "id": "mapper",
+      "description": "Mapper:",
+      "default": "MMC3",
+      "type": "pickString",
+      "options": [
+          "NROM",
+          "CNROM",
+          "MMC3"
+      ]
+    },
   ]
 }
 ```
