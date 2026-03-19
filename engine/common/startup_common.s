@@ -84,6 +84,8 @@ DATA_PTR:           .res 2
 .include "../../game/include.inc"
 .include "../../lib/libnes/neslib.s"
 
+.segment "STARTUP"
+
 ; implementation help from: https://nesdev.org/wiki/init_code
 ; and: https://github.com/cc65/cc65/blob/master/libsrc/nes/crt0.s
 start:
@@ -218,6 +220,7 @@ detectNTSC:
     sta PPU_SCROLL
 
     jsr _init_famitone
+    cli
 
     jmp _main
 

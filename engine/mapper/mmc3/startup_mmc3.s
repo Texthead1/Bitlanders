@@ -38,8 +38,6 @@ _init_mapper:
 
     lda #$80
     jsr _set_wram_mode
-
-    cli
     rts
 
 _init_famitone:

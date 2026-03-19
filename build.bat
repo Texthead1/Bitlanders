@@ -38,7 +38,7 @@ for /f %%F in (skysa_assembled.txt) do (
 
 set /p objlist=<skysa_objlist.txt
 
-ld65 -C engine\cfg\mmc3.cfg -o %out%.nes ^
+ld65 -C engine\cfg\%MAPPER%.cfg -o %out%.nes ^
     engine\common\startup_common.o ^
     src\main.o ^
     src\characters\23_wreckingball.o ^

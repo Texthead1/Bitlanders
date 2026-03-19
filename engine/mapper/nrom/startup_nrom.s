@@ -1,3 +1,5 @@
+.include "../../../lib/famitone2/famitone2.inc"
+
 _init_mapper_immediate:
     rts
 
@@ -16,3 +18,6 @@ _init_famitone:
     jsr FamiToneSfxInit
 .endif
     rts
+
+irq:
+; this doesn't actually get called
