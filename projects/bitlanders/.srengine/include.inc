@@ -1,4 +1,4 @@
-.include "../lib/nesdoug/nesdoug.s"
+.include "lib/nesdoug/nesdoug.s"
 
 .segment "RODATA"
     .global _demo_input
@@ -22,5 +22,5 @@ sounds_data:
     .incbin "../assets/chr/blank.chr"
 
 .segment "CODE"
-    .include "../lib/famitone2/famitone2.s"
-    .include "../lib/libskyretro/skyretro.s"
+    .include "lib/famitone2/famitone2.s"
+    .include "lib/libskyretro/skyretro.s"

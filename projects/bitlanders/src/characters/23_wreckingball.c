@@ -1,5 +1,5 @@
 #include "characters/23_wreckingball.h"
-#include "../lib/libnes/neslib.h"
+#include "lib/libnes/neslib.h"
 
 const unsigned char wreckingball_stand[] = {
     0x00, 0x00, 0x01, 0x00,

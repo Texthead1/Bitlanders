@@ -1,5 +1,5 @@
 #include "hats/17_bone.h"
-#include "../lib/libnes/neslib.h"
+#include "lib/libnes/neslib.h"
 
 const unsigned char bone_head_stand[] = {
     0x00, 0x00, 0x1D, 0x00 | 1,

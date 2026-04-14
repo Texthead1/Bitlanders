@@ -1,4 +1,4 @@
-.include "../../../lib/famitone2/famitone2.inc"
+.include "lib/famitone2/famitone2.inc"
 
 .include "mmc3_code.s"
 

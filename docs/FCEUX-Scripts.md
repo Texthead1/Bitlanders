@@ -1,7 +1,7 @@
 # SkyRetro FCEUX LUA Scripts
 Development scripts to help with SkyRetro Engine NES game development.
 
-## SkyRetro_Spoofer.lua
+## [SkyRetro_Spoofer.lua](/tools/FCEUX/SkyRetro_Spoofer.lua)
 ![spoofer](/assets/media/FCEUX_spoofer.png)
 
 This script currently spoofs bytes written by the NES ROM to a given address (`SKYRETRO_CMD_PORT`), and prints out relevant debugging information respective of the bytes it spoofs.

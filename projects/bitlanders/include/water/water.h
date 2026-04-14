@@ -1,4 +1,4 @@
-#include "../lib/libnes/neslib.h"
+#include "lib/libnes/neslib.h"
 
 extern unsigned char water_scanline_rows_remaining;
 #pragma zpsym("water_scanline_rows_remaining");

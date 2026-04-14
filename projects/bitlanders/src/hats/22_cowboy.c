@@ -1,5 +1,5 @@
 #include "hats/22_cowboy.h"
-#include "../lib/libnes/neslib.h"
+#include "lib/libnes/neslib.h"
 
 const unsigned char cowboy_hat_stand[] = {
     0x00, 0x00, 0x0D, 0x00 | 1,

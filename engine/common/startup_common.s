@@ -81,8 +81,8 @@ VRAM_INDEX:         .res 1
 META_PTR:           .res 2
 DATA_PTR:           .res 2
 
-.include "../../game/include.inc"
-.include "../../lib/libnes/neslib.s"
+.include ".srengine/include.inc"
+.include "lib/libnes/neslib.s"
 
 .segment "STARTUP"
 

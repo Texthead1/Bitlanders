@@ -1,5 +1,5 @@
-.include "../../engine/common/addresses.inc"
-.include "../../engine/common/macros.inc"
+.include "engine/common/addresses.inc"
+.include "engine/common/macros.inc"
 
 .importzp _irq_handler_ptr
 

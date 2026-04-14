@@ -1,5 +1,5 @@
 #include "hats/11_tophat.h"
-#include "../lib/libnes/neslib.h"
+#include "lib/libnes/neslib.h"
 
 const unsigned char top_hat_stand[] = {
     0x00, 0x00, 0x2D, 0x00 | 1,
