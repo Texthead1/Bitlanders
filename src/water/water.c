@@ -1,3 +1,4 @@
+#if MMC3
 #include "water/water.h"
 
 #pragma bss-name(push, "ZEROPAGE")
@@ -48,3 +49,4 @@ void setup_water_irq(unsigned char waterline) {
     *(unsigned char*)0xC001 = 0;
     *(unsigned char*)0xE001 = 0;
 }
+#endif

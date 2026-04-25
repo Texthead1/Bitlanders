@@ -117,7 +117,7 @@ const unsigned char* wreckingball_walk_anim[] = { wreckingball_walk1, wreckingba
 const unsigned char* wreckingball_walk_anim_flipped[] = { wreckingball_walk1_flipped, wreckingball_walk1_split_flipped, wreckingball_walk2_flipped, wreckingball_walk1_split_flipped };
 
 const unsigned char wreckingball_palette[] = {
-    0x0F, 0x01, 0x1C, 0x2A,
+    0x0F, 0x03, 0x21, 0x3A,
     0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00

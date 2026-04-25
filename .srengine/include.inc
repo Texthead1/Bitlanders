@@ -15,11 +15,26 @@ music_data:
 sounds_data:
 
 .segment "CHARS"
+.ifdef NROM
+    .incbin "../assets/chr/title.chr"
+.endif
+
+.ifdef MMC3
     .incbin "../assets/chr/title.chr"
     .incbin "../assets/chr/test.chr"
     .incbin "../assets/chr/characters/23_wreckingball.chr"
     .incbin "../assets/chr/echo.chr"
     .incbin "../assets/chr/blank.chr"
+.endif
+
+.ifdef CNROM
+    .incbin "../assets/chr/title.chr"
+    .incbin "../assets/chr/test.chr"
+    .incbin "../assets/chr/characters/23_wreckingball.chr"
+    .incbin "../assets/chr/cnrom/padding.chr"
+    .incbin "../assets/chr/echo.chr"
+    .incbin "../assets/chr/characters/23_wreckingball.chr"
+.endif
 
 .segment "CODE"
     .include "lib/famitone2/famitone2.s"

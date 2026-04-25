@@ -1,3 +1,4 @@
+.ifdef MMC3
 .include "engine/common/addresses.inc"
 .include "engine/common/macros.inc"
 
@@ -117,3 +118,4 @@ _water_distort_irq:
     tax
     pla
     rti
+.endif

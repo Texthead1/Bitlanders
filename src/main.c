@@ -7,12 +7,18 @@
 #pragma code-name("CODE")
 
 void main(void) {
+#if MMC3
     set_mirroring(MIRROR_VERTICAL);
+#elif CNROM
+    POKE(0x8000, 0);
+#endif
 
     ppu_off();
     pal_spr(title_palette_sprites);
 
+#if MMC3
     memfill(wram_array, 0, 0x2000); 
+#endif
 
     vram_adr(NAMETABLE_A);
     vram_unrle(title1);
@@ -262,8 +268,9 @@ void main(void) {
                 pal_fade_to(0, 4);
 
                 // load bean into second pattern table
+#if MMC3
                 set_chr_mode_0(0x0C);
-
+#endif
                 game_begun = TRUE;
                 lock_controls = TRUE;
             } else {
@@ -304,9 +311,11 @@ void main(void) {
             // LEVEL LOADING SYSTEM
             case STATE_2:
                 pal_bg(palette);
+#if MMC3
                 set_irq_handler(water_irq);
                 water_scanline_index = get_frame_count() >> 2 & 0x1F;
                 setup_water_irq(0xC4);
+#endif
                 if (pad1_poll & PAD_SELECT && !lock_controls) {
                     if (pad1_new & PAD_UP) {
                         ++level_pointer;
@@ -319,7 +328,9 @@ void main(void) {
                 oam_clear();
                 player_movement();
                 draw_player();
+#if MMC3
                 draw_water();
+#endif
                 break;
         }
         skyretro_update();
@@ -330,6 +341,7 @@ void main(void) {
     }
 }
 
+#if MMC3
 void set_irq_handler(void (*handler)(void)) {
     irq_handler_ptr[0] = (unsigned char)((unsigned)handler & 0xFF);
     irq_handler_ptr[1] = (unsigned char)(((unsigned)handler >> 8) & 0xFF);
@@ -338,6 +350,7 @@ void set_irq_handler(void (*handler)(void)) {
 void irq_stub(void) {
     __asm__("rti");
 }
+#endif
 
 void change_scene(void) {
     if (game_state == STATE_0) {
@@ -352,12 +365,16 @@ void change_scene(void) {
         ppu_on_all();
         write_emu_text();
 
+#if MMC3
         set_chr_mode_2(0x08);
         set_chr_mode_3(0x09);
         set_chr_mode_4(0x0A);
         set_chr_mode_5(0x0B);
 
         set_irq_handler(irq_stub);
+#elif CNROM
+        POKE(0x8000, 1);
+#endif
 
         if (!use_player_palette_for_hat) {
             set_hat_palette(current_hat);
@@ -374,12 +391,16 @@ void change_scene(void) {
         vram_unrle(echo);
         ppu_on_all();
 
+#if MMC3
         set_chr_mode_2(0x0D);
         set_chr_mode_3(0x0E);
         set_chr_mode_4(0x0F);
         set_chr_mode_5(0x10);
 
         set_irq_handler(irq_stub);
+#elif CNROM
+        POKE(0x8000, 2);
+#endif
     } else {
         pal_bg(palette);
         pal_spr(wreckingball_palette);
@@ -388,14 +409,18 @@ void change_scene(void) {
         PLAYER_SET_GROUNDED(FALSE);
         load_room();
 
+#if MMC3
         set_chr_mode_2(0x08);
         set_chr_mode_3(0x09);
         set_chr_mode_4(0x0A);
         set_chr_mode_5(0x0B);
-
+        
         pal_col(0x1D, water_palette[1]);
         pal_col(0x1E, water_palette[2]);
         pal_col(0x1F, water_palette[3]);
+#elif CNROM
+        POKE(0x8000, 1);
+#endif
         
         if (!use_player_palette_for_hat) {
             set_hat_palette(current_hat);
@@ -1171,6 +1196,7 @@ void draw_player(void) {
     oam_meta_spr(high_byte(player.x), high_byte(player.y), current_anim);
 }
 
+#if MMC3
 void draw_water(void) {
     oam_meta_spr(water_sprite_positions[0][get_frame_count() & 0x01] - water_sprite_offsets[(get_frame_count() >> 0x02) & 0x1F] - cam_x, 0xBF, water_sprite);
     oam_meta_spr(water_sprite_positions[1][get_frame_count() & 0x01] - water_sprite_offsets[(get_frame_count() >> 0x02) & 0x1F] - cam_x, 0xBF, water_sprite);
@@ -1181,3 +1207,4 @@ void draw_water(void) {
     oam_meta_spr(water_sprite_positions[6][get_frame_count() & 0x01] - water_sprite_offsets[(get_frame_count() >> 0x02) & 0x1F] - cam_x, 0xBF, water_sprite);
     oam_meta_spr(water_sprite_positions[7][get_frame_count() & 0x01] - water_sprite_offsets[(get_frame_count() >> 0x02) & 0x1F] - cam_x, 0xBF, water_sprite);
 }
+#endif

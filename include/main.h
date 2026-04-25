@@ -1,11 +1,15 @@
 #include "lib/libnes/neslib.h"
 #include "lib/nesdoug/nesdoug.h"
 #include "lib/libskyretro/skyretro.h"
+#if MMC3
 #include "engine/mapper/mmc3/mmc3_code.h"
 #include "engine/mapper/mmc3/mmc3_code.c"
+#endif
 #include "characters/23_wreckingball.h"
 #include "portal/portal_init.h"
+#if MMC3
 #include "water/water.h"
+#endif
 #include "metatiles.h"
 #include "title.h"
 #include "echo.h"
@@ -291,10 +295,11 @@ unsigned char demo_counter;
 
 unsigned char profile;
 
+#if MMC3
 #pragma bss-name(push, "XRAM")
 // extra RAM at $6000-$7fff
 unsigned char wram_array[0x2000];
-
+#endif
 #pragma bss-name(pop)
 
 // ENTITY VARIABLES
@@ -388,8 +393,11 @@ unsigned char text[0x10];
 #include "levels.h"
 
 // PROTOTYPES
+#if MMC3
 void set_irq_handler(void (*handler)(void));
 void irq_stub(void);
+#endif
+
 void change_scene(void);
 void write_emu_text(void);
 void change_room(void);
@@ -412,4 +420,6 @@ void calculate_eject_distance_down(signed char*);
 void set_hat_palette(const char);
 void set_hat_palette_to_player(void);
 void draw_player(void);
+#if MMC3
 void draw_water(void);
+#endif
