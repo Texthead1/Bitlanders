@@ -1,6 +1,6 @@
 #include "lib/libnes/neslib.h"
 #include "lib/nesdoug/nesdoug.h"
-#include "lib/libskyretro/skyretro.h"
+#include "lib/libnespipes/nespipes.h"
 #if MMC3
 #include "engine/mapper/mmc3/mmc3_code.h"
 #include "engine/mapper/mmc3/mmc3_code.c"

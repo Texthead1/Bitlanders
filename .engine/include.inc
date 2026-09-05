@@ -38,4 +38,4 @@ sounds_data:
 
 .segment "CODE"
     .include "lib/famitone2/famitone2.s"
-    .include "lib/libskyretro/skyretro.s"
+    .include "lib/libnespipes/nespipes.s"

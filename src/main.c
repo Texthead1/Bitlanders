@@ -34,7 +34,7 @@ void main(void) {
     PLAYER_SET_GROUNDED(FALSE);
 
     oam_spr(245, 162, 0xFE, 0x01);
-    skyretro_set_test_shared_s16();
+    nespipes_set_test_shared_s16();
     portal_init();
 
     game_state = STATE_TITLE;
@@ -76,9 +76,9 @@ void main(void) {
                     if (pad1_new & PAD_START) {
                         ++TITLE_MENU_STATE;
                     } else if (pad1_new & PAD_SELECT) {
-                        skyretro_set_emu(TRUE);
-                        skyretro_set_emu_state(EMU_STATE_REGULAR);
-                        skyretro_update();
+                        nespipes_set_emu(TRUE);
+                        nespipes_set_emu_state(EMU_STATE_REGULAR);
+                        nespipes_update();
                     }
                     break;
 
@@ -92,7 +92,7 @@ void main(void) {
 
                     ++TITLE_TEXT_PHASE;
 
-                    if (skyretro_is_emu()) {
+                    if (nespipes_is_emu()) {
                         if (TITLE_TEXT_PHASE == 24) {
                             ++TITLE_MENU_STATE;
                             TITLE_TEXT_PHASE = 0;
@@ -282,13 +282,13 @@ void main(void) {
         switch (game_state) {
             // EMULATOR STATE DEBUGGER
             case STATE_0:
-                temp_u8_0 = skyretro_emu_state();
+                temp_u8_0 = nespipes_emu_state();
                 oam_clear();
 
                 player_movement();
                 draw_player();
 
-                if (skyretro_flags_changed()) {
+                if (nespipes_flags_changed()) {
                     ppu_off();
                     vram_adr(NAMETABLE_A);
                     vram_fill(0,1024);
@@ -333,7 +333,7 @@ void main(void) {
 #endif
                 break;
         }
-        skyretro_update();
+        nespipes_update();
 
         if (profile) {
             gray_line();
@@ -431,9 +431,9 @@ void change_scene(void) {
 }
 
 void write_emu_text(void) {
-    if (skyretro_is_emu())
+    if (nespipes_is_emu())
     {
-        switch (skyretro_emu_state()) {
+        switch (nespipes_emu_state()) {
             case EMU_STATE_REGULAR:
                 multi_vram_buffer_horz(emu, sizeof(emu), NTADR_A(XPOS, YPOS));
                 break;
