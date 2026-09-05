@@ -3,7 +3,7 @@
 
 An in-development NES game based on Skylanders. Created in 6502 asm, C, and custom domain specific assembly language `SkyASM` for external communication.
 
-The NES ROM uses the MMC3 mapper and takes advantage of a theoretical piece of extension hardware - NEspipes - which can interface with USB peripheral devices through its peripheral interface controller (PIC). This additional hardware acts as a bridge between the game and the supported USB peripherals and can be interfaced with by the NES via the extension address line range `4020-4FFF`, which was only ever used by the Famicom Disk System.
+The NES ROM uses the MMC3 mapper and takes advantage of a theoretical piece of extension hardware - NESpipes - which can interface with USB peripheral devices through its peripheral interface controller (PIC). This additional hardware acts as a bridge between the game and the supported USB peripherals and can be interfaced with by the NES via the extension address line range `4020-4FFF`, which was only ever used by the Famicom Disk System.
 
 This theoretical extension hardware is also under development, currently as a full standalone hardware and NES emulator bundled together, but a lightweight .lua spoofer for the FCEUX NES emulator is also available.
 
